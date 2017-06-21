@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  h1 Welcome to Dashboard #{Ses.username}, #{Ses.userrole}
+  if Ses.userrole == 'client'
+    h3 My Orders
+    ul
+    each val, i in orders
+      li= orders[i].OrderName 
+        ul
+          each val, o in orders[i].OrderVotes
+            li= orders[i].OrderVotes[o]
+              form(method='post', action="/client_vote/" + orders[i].OrderVotes[o] + '.' + orders[i].id)
+                input(type='submit', value='Vote')
+    h3 Make new order
+    form(method="post" action='/new_order')
+      label Услуга 
+      input(type="text", value='', name="OrderName")
+      input(type="submit", value="Отправить")
+  else if Ses.userrole == 'master'
+    h3 Order pool
+    ul
+      each val, i in orders
+        li= orders[i].OrderName + ', ' + orders[i].OrderVotes 
+          form(method='post', action="/master_vote/" + Ses.username + '.' + orders[i].id)
+            input(type='submit', value='Vote') 
+        

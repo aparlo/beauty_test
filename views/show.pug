@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1 Show #{Header1}
+  //- h2 Add New Person
+  //- form(id="tst-base", method="post", action="/users")
+  //-   input(type="text", placeholder="First", name="First")
+  //-   input(type="text", placeholder="Last", name="Last")
+  //-   input(type="submit", value="Save")
+  h2 Edit Persons
+  each val, index in Fields
+    form(id="edit", method="post", action='/edit/' + Fields[index].id)
+      input(type="text", value=Fields[index].FirstName, name="First")
+      input(type="text", value=Fields[index].LastName, name="Last")
+      input(type="text", value=Fields[index].Sex, name="Sex")
+      input(type="submit", value="Save")
+  form(id="tst-base", method="post", action="/names")
+    input(type="text", placeholder="First", name="First")
+    input(type="text", placeholder="Last", name="Last")
+    input(type="text", placeholder="Sex", name="Sex")
+    input(type="submit", value="Add")
+//- + '?_method=PUT'

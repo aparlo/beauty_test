@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1 Edit Person
+    //- p= d.FirstName
+  form(method="post", action='/edit/' + d.id + '?_method=PUT')
+    input(name='_method', value='PUT', type='hidden')
+    input(type="text", value=d.FirstName, name="First")
+    input(type="text", value=d.LastName, name="Last")
+    input(type="submit", value="Save")

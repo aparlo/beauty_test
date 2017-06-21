@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1 Users
+  //- ul
+  //-   each val, i in users
+  //-     li= users[i].username + ' ' + users[i].password
+  each val, i in users
+    form(id="edit", method="post", action='/register/' + users[i].id)
+      input(type="text", value=users[i].username, name="username")
+      input(type="text", value=users[i].password, name="password")
+      select(name="role")
+        option(value="master", selected= users[i].role == 'master') master
+        option(value="client", selected= users[i].role == 'client') client
+      input(type="submit", value="Save")
+  form(id="add_user", method="post", action="/register")
+    input(type="text", placeholder="Usermane", name="username")
+    input(type="text", placeholder="Password", name="password")
+    select(name="role")
+      option(value="master") master
+      option(value="client") client
+    input(type="submit", value="Add")
