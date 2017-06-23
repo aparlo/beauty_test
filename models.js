@@ -10,7 +10,7 @@ var orderSchema = new mongoose.Schema({
   'OrderName': {type: String, requires: true},
   'OrderCustomer': String,
   'OrderVotes': [], //сюда помещается предложения исполнителей как объекты.
-  'OrderStatus': Boolean,
+  'OrderStatus': {type:String, default:'new'},
   'OrderMaster': String
 });
 

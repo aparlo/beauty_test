@@ -1,11 +1,10 @@
 var express = require('express');
 var session = require('express-session');
-var Store = require('express-session').Store;
-var MongooseStore = require('mongoose-express-session')('Store');
+var MongoStore = require('connect-mongo')(session);
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
-// var cookieParser = require('cookie-parser');
+var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var mongoose = require('mongoose');
@@ -24,8 +23,12 @@ app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(cookieParser());
-app.use(session({ secret: 'keyboard cat', cookie: { maxAge: 60000000 }}));
+app.use(cookieParser());
+app.use(session({
+  store: new MongoStore({url:url}),
+  secret: 'keyboard cat',
+  cookie: { maxAge: 60000000 }
+  }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -114,9 +117,8 @@ app.post('/edit/:id', function(req, res) {
 
 app.post('/new_order', loadUser, function(req, res) {
   var NewOrder = new model.Order({
-    OrderName: req.body.OrderName,
-    OrderCustomer: req.session.user,
-    OrderStatus: true
+      OrderName: req.body.OrderName,
+      OrderCustomer: req.session.user,
   });
   NewOrder.save(function(err, uDocs){
     console.log(uDocs);
@@ -124,15 +126,28 @@ app.post('/new_order', loadUser, function(req, res) {
   });
 });
 
-/* PUT Edit page. */
+/* MasteVote. */
 app.post('/master_vote/:mastername.:orderid', function(req, res) {
   model.Order.findByIdAndUpdate(
     req.params.orderid,
-    {$push: {OrderVotes:req.params.mastername}},
+    {$addToSet: {OrderVotes:req.params.mastername}},
     {safe: true, upsert: true},
     function(err, order_vote){
       console.log('New Vote');
       res.redirect('/dashboard');
+    }
+  )
+});
+
+/* ClientVote. */
+app.post('/client_vote/:mastername.:orderid', function(req, res) {
+  model.Order.findByIdAndUpdate(
+    req.params.orderid,
+    {$set: {OrderMaster:req.params.mastername, OrderStatus:'in_progress'}},
+    {safe: true, upsert: true},
+    function(err, order_vote){
+      console.log('Mater Vote');
+      res.redirect('/dashboard', {OrderStatus:'in_progress'});
     }
   )
 });
@@ -160,7 +175,7 @@ app.get('/dashboard', loadUser, function(req, res, next){
   if (req.session.userrole == 'client') {
     console.log('User is cleint!');
     model.Order.find({OrderCustomer:req.session.user}, function(err, docs){
-      console.log(docs);
+      // console.log(docs);
       res.render('dashboard', {orders:docs});
     })
   } else if (req.session.userrole == 'master'){
