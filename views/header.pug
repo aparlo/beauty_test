@@ -1,0 +1,25 @@
+nav(class="uk-navbar-container" uk-navbar)
+  .uk-navbar-left
+    a(class="uk-navbar-item uk-logo") TheTopMasters
+  .uk-navbar-center
+    ul.uk-navbar-nav
+      li
+        a(href="#") Услуги
+          .uk-navbar-dropdown
+            ul.uk-nav.uk-navbar-dropdown-nav
+              li
+                a(href="#") Уход за волосами
+              li
+                a(href="#") Уход за ногтями
+              li
+                a(href="#") Уход за телом  
+              li
+                a(href="#") Уход за телом 
+      li
+        a(href="#") Мастерам
+  .uk-navbar-right
+    div( class="uk-navbar-toggle" uk-toggle="target: #contact")
+      if !Ses
+        a(href='/login' ) login
+      else
+        a(href='/logout' class="uk-link") logout

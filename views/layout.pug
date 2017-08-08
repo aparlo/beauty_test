@@ -2,16 +2,11 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/uikit.css')
     script(type="text/javascript", src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+    script(type="text/javascript", src="/javascripts/uikit-icons.js")
+    script(type="text/javascript", src="/javascripts/uikit.min.js")
   body
-    h1 Layout here
-    if !Ses
-      a(href='/login') login
-      span
-    else
-      a(href='/logout') logout
-      span
+    include header
     block content
     include footer
-    
