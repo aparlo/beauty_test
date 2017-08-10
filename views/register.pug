@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  .uk-container.uk-container-small
+    form(method="post" action='/register/' enctype="multipart/form-data")
+      legend.uk-legend Register new user
+      .uk-margin
+        input.uk-input.uk-input-large(type="text" placeholder="Имя пользователя" name="username" required)
+      .uk-margin
+        input.uk-input(type="password" placeholder="Пароль" name="password" required)
+      .uk-margin
+        input.uk-input(type="text" placeholder="Имя" name="FirstName" required)        
+      .uk-margin
+        input.uk-input(type="text" placeholder="Фамилия" name="LastName" required)
+      .uk-margin
+        input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" required)      
+      .uk-margin
+        input.uk-input(type="email" placeholder="E-mail" name="Email" required)
+      .uk-margin
+        label #[input.uk-radio(type="radio" name="role" value="master" uk-toggle="target: #uslugi" checked)] Я мастер          
+        label #[input.uk-radio(type="radio" name="role" value="client" uk-toggle="target: #uslugi")] Я клиент
+      #uslugi
+        legend.uk-legend Какие услуги вы предоставляете
+        .uk-margin.uk-grid-small.uk-child-width-auto.uk-grid
+          each val, i in uslugi
+            label #[input.uk-checkbox(type="checkbox" name="uslugi" value=uslugi[i].cat)] #{uslugi[i].cat}
+        .uk-margin
+          textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
+        .uk-margin
+            input(type="file" name="avatar")
+      button.uk-button(type="submit") Submit

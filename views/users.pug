@@ -2,20 +2,37 @@ extends layout
 
 block content
   h1 Users
-  //- ul
-  //-   each val, i in users
-  //-     li= users[i].username + ' ' + users[i].password
-  each val, i in users
-    form(id="edit", method="post", action='/register/' + users[i].id)
-      input(type="text", value=users[i].username, name="username")
-      input(type="text", value=users[i].password, name="password")
-      select(name="role")
-        option(value="master", selected= users[i].role == 'master') master
-        option(value="client", selected= users[i].role == 'client') client
-      input(type="submit", value="Save")
+    h4 #[span username] #[span Password] #[span FirstName] #[span LastName] #[span PhoneNumber] #[span E-mail] #[span About] #[span Role]
+    
+    each val, i in users
+      form(id="edit", method="post", action='/register/' + users[i].id)
+        input(type="text", value=users[i].username, name="username")
+        input(type="text", value=users[i].password, name="password")
+        input(type="text", value=users[i].FirstName, name="FirstName")
+        input(type="text", value=users[i].LastName, name="LastName")
+        input(type="text", value=users[i].PhoneNumber, name="PhoneNumber")
+        input(type="text", value=users[i].Email, name="Email")
+        input(type="text", value=users[i].about, name="about")
+        select(name="role")
+          option(value="master", selected= users[i].role == 'master') master
+          option(value="client", selected= users[i].role == 'client') client
+        input(type="submit", value="Save")
   form(id="add_user", method="post", action="/register")
-    input(type="text", placeholder="Usermane", name="username")
-    input(type="text", placeholder="Password", name="password")
+    label username #[br]
+      input(type="text", placeholder="Usermane", name="username")
+    label password #[br]
+      input(type="text", placeholder="Password", name="password")
+    label FirstName   #[br]
+      input(type="text", name="FirstName")
+    label LastName   #[br]
+      input(type="text", name="LastName")
+    label Phone   #[br]
+      input(type="text", name="PhoneNumber")
+    label E-mail #[br]
+      input(type="text", name="Email")
+    label About #[br]
+      input(type="text", name="about")
+    label Role #[br]
     select(name="role")
       option(value="master") master
       option(value="client") client

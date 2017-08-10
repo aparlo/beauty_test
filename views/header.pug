@@ -4,22 +4,16 @@ nav(class="uk-navbar-container" uk-navbar)
   .uk-navbar-center
     ul.uk-navbar-nav
       li
-        a(href="#") Услуги
-          .uk-navbar-dropdown
-            ul.uk-nav.uk-navbar-dropdown-nav
-              li
-                a(href="#") Уход за волосами
-              li
-                a(href="#") Уход за ногтями
-              li
-                a(href="#") Уход за телом  
-              li
-                a(href="#") Уход за телом 
+        each val, i in uslugi
+          li
+            a(href="/" + uslugi[i].cat) #{uslugi[i].cat}
       li
         a(href="#") Мастерам
   .uk-navbar-right
-    div( class="uk-navbar-toggle" uk-toggle="target: #contact")
+    div( class="uk-navbar-toggle" uk-toggle="target: #login")
       if !Ses
-        a(href='/login' ) login
+        p login
       else
-        a(href='/logout' class="uk-link") logout
+        p logout
+#login(uk-modal)
+  include login

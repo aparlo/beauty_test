@@ -12,6 +12,11 @@ var model = require('./models.js');
 var url = 'mongodb://macbot.local:27017/testing-new';
 var db = mongoose.connect(url);
 var app = express();
+const multer = require('multer');
+var storage = multer.memoryStorage();
+var upload = multer({storage: storage})
+
+// var uslugi = require('./uslugi.json')
 
 // mongoose.connect();
 // view engine setup
@@ -31,6 +36,21 @@ app.use(session({
   }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// function.loadUslugi(req, res, next){
+//   model.Uslugi.find(function(err, uslugi){
+//     res.local.uslugi = uslugi
+//   })
+// }
+
+app.use('/', function(req, res, next){
+  model.Uslugi.find(function(err, uslugi){
+    console.log('Услуги:' + uslugi)
+    res.locals.uslugi = uslugi
+    next()
+  })
+})
+
 
 function loginUser(req, res, next) {
   model.User.findOne({username: req.body.username}, function(err, user){
@@ -66,20 +86,65 @@ function loadUser(req, res, next){
   }
 };
 app.get('/', function(req, res){
-  res.render('index');
+  model.User.find(function(err, docs) {
+    res.render('index', {masters: docs});
+  })
 });
 
+// app.get('/:usluga', function(req, res){
+//   var usluga = req.params.usluga
+//   console.log(usluga)
+//   model.User.find({uslugi:usluga}, function(err, docs) {
+//     res.render('index', {masters: docs, uslugi:uslugi});
+//   })
+// });
 
-app.post('/register', function(req, res, next) {
+// SignUp
+app.get('/signin', function(req, res, next) {
+  res.render('signin')
+})
+
+app.get('/register', function(req, res, next){
+  res.render('register')
+})
+
+app.post('/register', upload.single('avatar'), function(req, res, next) {
   var User = new model.User({
       username: req.body.username,
       password: req.body.password,
-      role: req.body.role
+      FirstName: req.body.FirstName,
+      LastName: req.body.LastName,
+      PhoneNumber: req.body.PhoneNumber,
+      Email: req.body.Email,
+      role: req.body.role,
+      about: req.body.about,
+      status: 'active',
+      uslugi: req.body.uslugi
   });
   console.log(User.username + '' + User.password);
   User.save();
   db.close;
-  res.redirect('/users');
+  res.redirect('/');
+});
+
+/* Edit registered users */
+app.post('/register/:id', function(req, res) {
+  console.log(req.body)
+  var userid = req.params.id;
+  model.User.findById(userid, function(err, docs) {
+    docs.username = req.body.username;
+    docs.password = req.body.password;
+    docs.role = req.body.role;
+    docs.FirstName = req.body.FirstName;
+    docs.LastName = req.body.LastName;
+    docs.PhoneNumber = req.body.PhoneNumber;
+    docs.Email = req.body.Email;
+    docs.about = req.body.about;
+    docs.save(function(err, uDocs){
+      console.log(uDocs);
+      res.redirect('/users', {uslugi:uslugi});
+    });
+  });
 });
 
 app.get('/users', function(req, res, next){
@@ -89,31 +154,17 @@ app.get('/users', function(req, res, next){
 });
 
 /* PUT Edit page. */
-app.post('/register/:id', function(req, res) {
-  var userid = req.params.id;
-  model.User.findById(userid, function(err, docs) {
-    docs.username = req.body.username;
-    docs.password = req.body.password;
-    docs.role = req.body.role;
-    docs.save(function(err, uDocs){
-      console.log(uDocs);
-      res.redirect('/users');
-    });
-  });
-});
-
-/* PUT Edit page. */
-app.post('/edit/:id', function(req, res) {
-  var userid = req.params.id;
-  model.Names.findById(userid, function(err, docs) {
-    docs.FirstName = req.body.First;
-    docs.LastName = req.body.Last;
-    docs.Sex = req.body.Sex;
-    docs.save(function(err, uDocs){
-      res.redirect('/names');
-    });
-  });
-});
+// app.post('/edit/:id', function(req, res) {
+//   var userid = req.params.id;
+//   model.Names.findById(userid, function(err, docs) {
+//     docs.FirstName = req.body.First;
+//     docs.LastName = req.body.Last;
+//     docs.Sex = req.body.Sex;
+//     docs.save(function(err, uDocs){
+//       res.redirect('/names');
+//     });
+//   });
+// });
 
 app.post('/new_order', loadUser, function(req, res) {
   var NewOrder = new model.Order({
@@ -186,26 +237,6 @@ app.get('/dashboard', loadUser, function(req, res, next){
     })
   }
 });
-
-
-/* GET Show page. */
-app.get('/names', function(req, res, next) {
-  model.Names.find(function (err, docs){
-    res.render('show', {Fields: docs});
-    db.close;
-  });
-});
-
-// /* GET Edit page. */
-// app.get('/edit/:id', function(req, res, next) {
-//   var userid = req.params.id;
-//   model.Names.findById(userid, function(err, docs) {
-//     res.render('edit', {d:docs});
-//     console.log(docs);
-//   });
-// });
-
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

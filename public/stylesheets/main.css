@@ -1,0 +1,15 @@
+div.grid {
+    display: table;
+}
+
+div.grid > form {
+    display: table-row;
+
+
+div.grid > form > div {
+    display: table-cell;
+}
+div.grid > form > div.head {
+    text-align: center;
+    font-weight: 800;
+}

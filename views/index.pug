@@ -1,19 +1,20 @@
 extends layout
-mixin cards
-  div
-    .uk-card.uk-card-default
-      .uk-card-header
-        h3.uk-card-title Маша Каренина
-      .uk-card-body
-        p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-      .uk-card-footer
-        p Read more...
+
 block content
-  div(class="uk-section uk-section-media uk-section-xlarge uk-section-cover" style="background-image: url(images/back1.png)")
-    p.uk-heading-primary.uk-text-center.uk-light Красота спасет мир!
+  div(class="uk-section uk-section-media uk-section-large uk-section-cover" style="background-image: url(images/back1.png)")
+    p.uk-heading-primary.uk-text-center.uk-light Мы делаем красоту доступнее!
+    .uk-flex.uk-flex-center
+      form.uk-search
+        span(uk-search-icon)
+        input.uk-search-input(name="uslugi" type="search")
   div(class="uk-container uk-container-small uk-position-relative uk-padding-large uk-background-muted" style="margin-top:-70px;")
     .uk-grid.uk-child-width-1-2.uk-text-center(uk-grid)
-      +cards
-      +cards
-      +cards
-      +cards
+      each val, i in masters
+        div
+          .uk-card.uk-card-default
+            .uk-card-header
+              h3.uk-card-title= masters[i].FirstName + ' ' + masters[i].LastName
+            .uk-card-body
+              p= masters[i].about
+            .uk-card-footer
+              p Read more...
