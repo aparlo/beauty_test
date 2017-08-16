@@ -1,12 +1,12 @@
 .uk-modal-dialog.uk-modal-body
-    h2.uk-modal-title Login
+    h2.uk-modal-title Вход
     button.uk-modal-close-outside(type="button" uk-close)
     form(method="post" action='/login')
       fieldset.uk-fieldset
         .uk-margin
-          input.uk-input(type="text" value='' name="username" placeholder="Login")
+          input.uk-input(type="text" value='' name="username" placeholder="Имя пользователя")
         .uk-margin
-          input.uk-input(type="password" value='' name="password" placeholder="Password")
+          input.uk-input(type="password" value='' name="password" placeholder="Пароль")
         button.uk-button.uk-button-default(type="submit") Login
         a.uk-button.uk-button-secondary(href="/register") Register
     h3 #{error}

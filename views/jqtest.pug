@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  script
+  ul
+    each val in uslugi
+      li= val.id
+        ul
+          each key in val.sub_cat
+            li= key.key
+            input.parent(type='checkbox' name="uslugi" value='cheked')
+  #log

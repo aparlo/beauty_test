@@ -27,7 +27,7 @@ app.set('view engine', 'pug');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({
   store: new MongoStore({url:url}),
@@ -37,15 +37,15 @@ app.use(session({
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// function.loadUslugi(req, res, next){
+// function(req, res, next){
 //   model.Uslugi.find(function(err, uslugi){
-//     res.local.uslugi = uslugi
+//     res.locals.uslugi = uslugi
+//     next()
 //   })
 // }
 
 app.use('/', function(req, res, next){
   model.Uslugi.find(function(err, uslugi){
-    console.log('Услуги:' + uslugi)
     res.locals.uslugi = uslugi
     next()
   })
@@ -91,13 +91,16 @@ app.get('/', function(req, res){
   })
 });
 
-// app.get('/:usluga', function(req, res){
-//   var usluga = req.params.usluga
-//   console.log(usluga)
-//   model.User.find({uslugi:usluga}, function(err, docs) {
-//     res.render('index', {masters: docs, uslugi:uslugi});
-//   })
-// });
+app.get('/filter/:usluga', function(req, res){
+  var usluga = req.params.usluga
+  console.log('Выбрана' + usluga)
+  model.Uslugi.findOne({_id:usluga}, function(err, usluga){
+    model.User.find({"uslugi.cat":usluga.id}, function(err, docs) {
+      console.log(docs.username + usluga)
+      res.render('index', {masters: docs});
+    })
+  })
+});
 
 // SignUp
 app.get('/signin', function(req, res, next) {
@@ -109,23 +112,28 @@ app.get('/register', function(req, res, next){
 })
 
 app.post('/register', upload.single('avatar'), function(req, res, next) {
-  var User = new model.User({
-      username: req.body.username,
-      password: req.body.password,
-      FirstName: req.body.FirstName,
-      LastName: req.body.LastName,
-      PhoneNumber: req.body.PhoneNumber,
-      Email: req.body.Email,
-      role: req.body.role,
-      about: req.body.about,
-      status: 'active',
-      uslugi: req.body.uslugi
-  });
-  console.log(User.username + '' + User.password);
-  User.save();
-  db.close;
-  res.redirect('/');
+  var uslugi = Array.prototype.slice.call(req.body.uslugi)
+  console.log(uslugi);
+  var User = new model.User
+  User.username = req.body.username
+  User.password = req.body.password
+  User.FirstName = req.body.FirstName
+  User.LastName = req.body.LastName
+  User.PhoneNumber = req.body.PhoneNumber
+  User.Email = req.body.Email
+  User.role = req.body.role
+  User.about =  req.body.about
+  User.status = 'active'
+  User.uslugi = uslugi
+  User.city = req.body.city
+  User.save()
+  db.close
+  next()
 });
+
+app.get('/jqtest', function(req, res, next){
+  res.render('jqtest')
+})
 
 /* Edit registered users */
 app.post('/register/:id', function(req, res) {
@@ -142,12 +150,13 @@ app.post('/register/:id', function(req, res) {
     docs.about = req.body.about;
     docs.save(function(err, uDocs){
       console.log(uDocs);
-      res.redirect('/users', {uslugi:uslugi});
+      res.redirect('/users');
     });
   });
 });
 
 app.get('/users', function(req, res, next){
+  console.log('users')
   model.User.find(function(err, docs) {
     res.render('users', {users: docs});
   })

@@ -1,29 +1,43 @@
 extends layout
 
 block content
+  script
+    include ../public/javascripts/register.js
   .uk-container.uk-container-small
-    form(method="post" action='/register/' enctype="multipart/form-data")
+    form(method="post" action='/register' enctype="multipart/form-data")
       legend.uk-legend Register new user
       .uk-margin
         input.uk-input.uk-input-large(type="text" placeholder="Имя пользователя" name="username" required)
       .uk-margin
-        input.uk-input(type="password" placeholder="Пароль" name="password" required)
+        input.uk-input(type="password" placeholder="Пароль" name="password" )
       .uk-margin
-        input.uk-input(type="text" placeholder="Имя" name="FirstName" required)        
+        input.uk-input(type="text" placeholder="Имя" name="FirstName" )        
       .uk-margin
-        input.uk-input(type="text" placeholder="Фамилия" name="LastName" required)
+        input.uk-input(type="text" placeholder="Фамилия" name="LastName" )
       .uk-margin
-        input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" required)      
+        input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" )      
       .uk-margin
-        input.uk-input(type="email" placeholder="E-mail" name="Email" required)
+        input.uk-input(type="email" placeholder="E-mail" name="Email" )
+      .uk-margin
+        select.uk-select(name="city")
+          option Воронеж
       .uk-margin
         label #[input.uk-radio(type="radio" name="role" value="master" uk-toggle="target: #uslugi" checked)] Я мастер          
         label #[input.uk-radio(type="radio" name="role" value="client" uk-toggle="target: #uslugi")] Я клиент
       #uslugi
         legend.uk-legend Какие услуги вы предоставляете
         .uk-margin.uk-grid-small.uk-child-width-auto.uk-grid
-          each val, i in uslugi
-            label #[input.uk-checkbox(type="checkbox" name="uslugi" value=uslugi[i].cat)] #{uslugi[i].cat}
+          ul(uk-accordion)
+            each val, i in uslugi
+              li
+                h3.uk-accordion-title= uslugi[i].cat
+                .uk-accordion-content
+                  input.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][cat]" value=uslugi[i].id)
+                  ul
+                    each val, k in uslugi[i].sub_cat
+                      li 
+                        label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat][key]" value=uslugi[i].sub_cat[k].key)] #{uslugi[i].sub_cat[k].name}
+                        input#sprice(type="number" placeholder="Цена от" name="uslugi["+i+"][sub_cat][sprice]" value=uslugi[i].sub_cat[k].sprice disabled)
         .uk-margin
           textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
         .uk-margin

@@ -1,19 +1,35 @@
 nav(class="uk-navbar-container" uk-navbar)
   .uk-navbar-left
     a(class="uk-navbar-item uk-logo") TheTopMasters
-  .uk-navbar-center
-    ul.uk-navbar-nav
+  .uk-navbar-left
+    ul.uk-navbar-nav.uk-nav-defaut(uk-nav)
       li
         each val, i in uslugi
           li
-            a(href="/" + uslugi[i].cat) #{uslugi[i].cat}
-      li
-        a(href="#") Мастерам
+            a(href="/filter/" + uslugi[i].id) #{uslugi[i].cat}
+      li.uk-parent(uk-nav)
+        a.uk-navbar-toggle(uk-navbar-toggle-icon uk-toggle="target: #nav_advance" href="" )
   .uk-navbar-right
-    div( class="uk-navbar-toggle" uk-toggle="target: #login")
+    a.uk-button.uk-button-secondary Стать мастером
+    div(class="uk-navbar-toggle" uk-toggle="target: #login")
+      span.uk-margin-small-right(uk-icon="icon: sign-in")
       if !Ses
-        p login
+        a.uk-link-text Зарегистрироваться / Войти
       else
-        p logout
+        a.uk-link-text Выход
+    
 #login(uk-modal)
   include login
+#nav_advance(uk-modal-page hidden)
+  .uk-modal-body.uk-background-muted()
+    nav.uk-navbar-container(uk-navbar)
+      .uk-navbar-center
+          ul.uk-navbar-nav
+            li
+              a Мастерам
+            li
+              a Партнерам
+            li
+              a О нас
+            li
+              a Контакты

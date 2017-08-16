@@ -1,5 +1,10 @@
 var mongoose = require('mongoose');
 
+var uslugiSchema = new mongoose.Schema({
+  'cat': String,
+  'sub_cat': []
+})
+
 var userSchema = new mongoose.Schema({
   'username': {type: String, required: true, index: {unique:true}},
   'password': {type: String, required: true},
@@ -11,15 +16,12 @@ var userSchema = new mongoose.Schema({
   'status':['active', 'blocked', 'vip'],
   'about': String,
   'avatar': { data: Buffer, contentType: String },
-  'uslugi': [],
+  'uslugi': [uslugiSchema],
   'rating': Number,
-  'city': String
+  'city': String,
+  'portfolio': [],
+  'Reviews': []
 });
-
-var uslugiSchema = new mongoose.Schema({
-  'cat': String,
-  'subcat': []
-})
 
 var orderSchema = new mongoose.Schema({
   'OrderName': {type: String, requires: true},
