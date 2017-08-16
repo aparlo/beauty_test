@@ -20,7 +20,9 @@ var userSchema = new mongoose.Schema({
   'rating': Number,
   'city': String,
   'portfolio': [],
-  'Reviews': []
+  'Reviews': [],
+  'peresvon': String,
+  'mesto_priema': String
 });
 
 var orderSchema = new mongoose.Schema({

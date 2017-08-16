@@ -10,11 +10,12 @@ nav(class="uk-navbar-container" uk-navbar)
       li.uk-parent(uk-nav)
         a.uk-navbar-toggle(uk-navbar-toggle-icon uk-toggle="target: #nav_advance" href="" )
   .uk-navbar-right
-    a.uk-button.uk-button-secondary Стать мастером
+    a.uk-button.uk-button-secondary.uk-margin-small-right Стать мастером
+    a.uk-button.uk-button-default Стать клиентом
     div(class="uk-navbar-toggle" uk-toggle="target: #login")
       span.uk-margin-small-right(uk-icon="icon: sign-in")
       if !Ses
-        a.uk-link-text Зарегистрироваться / Войти
+        a.uk-link-text Войти
       else
         a.uk-link-text Выход
     
