@@ -1,0 +1,7 @@
+h3 Order pool
+ul
+  each val, i in orders
+    if orders[i].OrderStatus == 'new'
+      li= orders[i].OrderName + ', ' + orders[i].OrderVotes
+        form(method='post', action="/master_vote/" + Ses.username + '.' + orders[i].id)
+          input(type='submit', value='Vote') 

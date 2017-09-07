@@ -2,7 +2,7 @@ extends layout
 
 block content
   div(class="uk-section uk-section-media uk-section-large uk-section-cover" style="background-image: url(/images/back1.png)")
-    p.uk-heading-primary.uk-text-center.uk-light Мы делаем красоту доступнее!
+    p.uk-heading-primary.uk-text-center.uk-light Делаем красоту доступнее!
     .uk-flex.uk-flex-center
       form
         .uk-inline
@@ -11,11 +11,14 @@ block content
   div(class="uk-container uk-container-small uk-position-relative uk-padding-large uk-background-muted" style="margin-top:-70px;")
     .uk-grid.uk-child-width-1-2.uk-text-center(uk-grid)
       each val, i in masters
-        div
-          .uk-card.uk-card-default
-            .uk-card-header
-              h3.uk-card-title= masters[i].FirstName + ' ' + masters[i].LastName
-            .uk-card-body
-              p= masters[i].about
-            .uk-card-footer
-              p Read more...
+        li= masters[i].username
+          ul
+            each val, k in masters[i].uslugi
+              if val != null
+                li= val.name.name
+                  ul
+                    each val, j in masters[i].uslugi[k].sub_cat
+                      if val != null
+                        li= val.name
+                      else
+              else

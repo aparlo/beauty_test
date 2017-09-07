@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  form(method="post", action="/uslugi_newcat")
+    label Add Category
+      input(type="text" name="cat")
+    button(type="submit") Submit
+
+  form(method="post", action="/uslugi_add")
+    label Category
+      select(name="cat")
+        each val, i in uslugi
+          option(name='cat' value=val._id) #{val.name}
+    label Subcategory
+      input(type="text" name="name")
+    button(type="submit") Submit
+
+  ul
+    each val, i in uslugi
+      li= val.name
+        ul
+          each val, j in uslugi[i].sub_cat
+            li= val.name
+         

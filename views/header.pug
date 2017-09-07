@@ -1,26 +1,23 @@
 nav(class="uk-navbar-container" uk-navbar)
   .uk-navbar-left
-    a(class="uk-navbar-item uk-logo") TheTopMasters
+    a(class="uk-navbar-item uk-logo" href="/") TheTopMasters
   .uk-navbar-left
     ul.uk-navbar-nav.uk-nav-defaut(uk-nav)
       li
         each val, i in uslugi
           li
-            a(href="/filter/" + uslugi[i].id) #{uslugi[i].cat}
+            a(href="/filter/" + uslugi[i].id) #{uslugi[i].name}
       li.uk-parent(uk-nav)
         a.uk-navbar-toggle(uk-navbar-toggle-icon uk-toggle="target: #nav_advance" href="" )
   .uk-navbar-right
-    a.uk-button.uk-button-secondary.uk-margin-small-right Стать мастером
-    a.uk-button.uk-button-default Стать клиентом
-    div(class="uk-navbar-toggle" uk-toggle="target: #login")
+    a.uk-button.uk-button-secondary.uk-margin-right( href="/register") Стать мастером
+    .uk-margin-right
       span.uk-margin-small-right(uk-icon="icon: sign-in")
       if !Ses
-        a.uk-link-text Войти
+        a.uk-button.uk-button-text(href="/login") Войти
       else
-        a.uk-link-text Выход
+        a.uk-link-text(href="/logout") Выход
     
-#login(uk-modal)
-  include login
 #nav_advance(uk-modal-page hidden)
   .uk-modal-body.uk-background-muted()
     nav.uk-navbar-container(uk-navbar)

@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var mongoose = require('mongoose');
 var model = require('./models.js');
-var url = 'mongodb://localhost:27017/testing-new';
+var url = 'mongodb://beauty:1121@thetopmasters.ru:27017/testing-new';
 var db = mongoose.connect(url);
 var app = express();
 const multer = require('multer');
@@ -30,9 +30,9 @@ let transporter = nodemailer.createTransport({
 
 // setup email data with unicode symbols
 let mailOptions = {
-    from: '"Fred Foo π‘»" <aparlo@yandex.ru>', // sender address
+    from: '"Fred Foo €τ¨¤συ½πΏ±»" <aparlo@yandex.ru>', // sender address
     to: 'aparlo@icloud.com, parlobox@gmail.com', // list of receivers
-    subject: 'Hello β”', // Subject line
+    subject: 'Hello ς¥Τ', // Subject line
     text: 'Hello world ?', // plain text body
     html: '<b>Hello world ?</b>' // html body
 }
@@ -62,6 +62,21 @@ app.use(session({
   }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// function(req, res, next){
+//   model.Uslugi.find(function(err, uslugi){
+//     res.locals.uslugi = uslugi
+//     next()
+//   })
+// }
+
+app.use('/', function(req, res, next){
+  model.Uslugi.find(function(err, uslugi){
+    res.locals.uslugi = uslugi
+    next()
+  })
+})
+
 
 function loginUser(req, res, next) {
   model.User.findOne({username: req.body.username}, function(err, user){
@@ -96,67 +111,17 @@ function loadUser(req, res, next){
     res.redirect('/login');
   }
 };
-
-app.use('/', function(req, res, next){
-  model.Cat.find()
-  .populate('sub_cat')
-  .exec(function(err, uslugi) {
-    res.locals.uslugi = uslugi
-    next()
-  })
-})
-
-//Uslugi Show, Edit, Add
-app.get('/uslugi', function(req, res, next){
-  res.render('uslugi')
-})
-
-app.post('/uslugi_newcat', function(req, res, next){
-  console.log(req.body);
-  Cat = new model.Cat({
-    _id: new mongoose.Types.ObjectId(),
-    name: req.body.cat
-  })
-  Cat.save()
-  res.redirect('/uslugi')
-})
-
-app.post('/uslugi_add', function(req, res, next){
-  console.log(req.body);
-  Usluga = new model.Uslugi
-  Usluga._id = new mongoose.Types.ObjectId()
-  Usluga.name = req.body.name
-  Usluga.cat = req.body.cat
-  Usluga.save(function(err){
-    if (err) console.log(err);
-    console.log(Usluga._id);
-    model.Cat.update({_id: req.body.cat}, {$addToSet: {sub_cat:Usluga._id}}).exec()
-  })
-  res.redirect('/uslugi')
-})
-
-
-//Main Page
 app.get('/', function(req, res){
-  model.User.find({}).populate({
-    path:'uslugi.name',
-    select:'name',
-    model:'Cat'
-  }).exec(function(err, docs){
-    model.User.populate(docs, {
-      path:'uslugi.sub_cat',
-      model:'Uslugi'
-    }, function(err, docs) {
-          res.render('index', {masters: docs})
-    })
+  model.User.find({})
+  .exec(function(err, docs){
+    console.log(docs);
+    res.render('index', {masters: docs})
   })
 })
 
-
-//Filter
 app.get('/filter/:usluga', function(req, res){
   var usluga = req.params.usluga
-  console.log('Π’Ρ‹Π±Ρ€Π°Π½Π°' + usluga)
+  console.log('τ¨²τ¨λτ¨Ρτ¨ΰτ¨Πτ¨έτ¨Π' + usluga)
   model.Uslugi.findOne({_id:usluga}, function(err, usluga){
     model.User.find({"uslugi.cat":usluga.id}, function(err, docs) {
       console.log(docs.username + '' + usluga)
@@ -165,36 +130,18 @@ app.get('/filter/:usluga', function(req, res){
   })
 });
 
-
-
 // SignUp
 app.get('/signin', function(req, res, next) {
   res.render('signin')
 })
 
-//Login
-app.post('/login', loginUser, function(req, res){
-  res.redirect('/dashboard');
-});
-
-app.get('/login', function(req, res, next){
-  res.locals.User = req.session;
-  res.render('login');
-});
-
-app.get('/logout', function(req, res, next){
-  req.session.destroy;
-  res.redirect('/login');
-});
-
-//Register
 app.get('/register', function(req, res, next){
   res.render('register')
 })
 
 app.post('/register', upload.single('avatar'), function(req, res, next) {
-  console.log(req.body.uslugi);
   var uslugi = Array.prototype.slice.call(req.body.uslugi)
+  console.log(uslugi);
   var User = new model.User
   User.username = req.body.username
   User.password = req.body.password
@@ -210,14 +157,15 @@ app.post('/register', upload.single('avatar'), function(req, res, next) {
   User.go_out = req.body.go_out
   User.save(function (err, master) {
     if (err) console.log(err)
-    console.log('registered')
+    console.log(master)
   })
   db.close
-  res.redirect('/register')
+  next()
 });
 
+app.get('')
 
-// Edit registered users
+/* Edit registered users */
 app.post('/register/:id', function(req, res) {
   var uslugi = Array.prototype.slice.call(req.body.uslugi)
   var userid = req.params.id;
@@ -237,8 +185,6 @@ app.post('/register/:id', function(req, res) {
   });
 });
 
-
-//Show Users
 app.get('/users', function(req, res, next){
   console.log('users')
   model.User.find(function(err, docs) {
@@ -248,20 +194,23 @@ app.get('/users', function(req, res, next){
 
 /* PUT Edit page. */
 // app.post('/edit/:id', function(req, res) {
-//   var userid = req.params.id;
-//   model.Names.findById(userid, function(err, docs) {
+//   var uwqeqfafadserid = req.params.id;
+//   model.Names.fiOBndById(userid, function(err, docs) {
 //     docs.FirstName = req.body.First;
-//     docs.LastName = req.body.Last;
+//     docs.LastName 
+= req.body.Last;
 //     docs.Sex = req.body.Sex;
 //     docs.save(function(err, uDocs){
 //       res.redirect('/names');
 //     });
 //   });
-// });
+qq
+q
+q
+q
+q
+vadvadvdxv// });
 
-
-
-//Orders
 app.post('/new_order', loadUser, function(req, res) {
   var NewOrder = new model.Order({
       OrderName: req.body.OrderName,
@@ -299,8 +248,19 @@ app.post('/client_vote/:mastername.:orderid', function(req, res) {
   )
 });
 
+app.post('/login', loginUser, function(req, res){
+  res.redirect('/dashboard');
+});
 
+app.get('/login', function(req, res, next){
+  res.locals.User = req.session;
+  res.render('login');
+});
 
+app.get('/logout', function(req, res, next){
+  req.session.destroy;
+  res.redirect('/login');
+});
 
 app.get('/session', loadUser, function(req, res, next){
   res.send(req.session.id + ' ' + req.session.userrole);

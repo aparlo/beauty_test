@@ -1,30 +1,65 @@
 extends layout
 
 block content
-  h1 Welcome to Dashboard #{Ses.username}, #{Ses.userrole}
-  if Ses.userrole == 'client'
-    h3 My Orders
-    ul
-    //- Here must use CASE
-    each val, i in orders
-      li= orders[i].OrderName + ',' + orders[i].OrderMaster + ', ' + orders[i].OrderStatus
-        ul
-          if orders[i].OrderStatus == 'new'
-            each val, o in orders[i].OrderVotes
-              li= orders[i].OrderVotes[o]
-                form(method='post', action="/client_vote/" + orders[i].OrderVotes[o] + '.' + orders[i].id)
-                  input(type='submit', value='Vote')
-    h3 Make new order
-    form(method="post" action='/new_order')
-      label Услуга 
-      input(type="text", value='', name="OrderName")
-      input(type="submit", value="Отправить")
-  else if Ses.userrole == 'master'
-    h3 Order pool
-    ul
-      each val, i in orders
-        if orders[i].OrderStatus == 'new'
-          li= orders[i].OrderName + ', ' + orders[i].OrderVotes
-            form(method='post', action="/master_vote/" + Ses.username + '.' + orders[i].id)
-              input(type='submit', value='Vote') 
+  .uk-section.uk-section-primary
+    .uk-container.uk-padding-medium.uk-text-center
+      h1.uk-heading Добро пожаловать, #{Ses.user.FirstName}!
+  .uk-section.uk-section-muted.uk-padding-large
+    .uk-grid
+      .uk-panel
+        .uk-card.uk-card-default.uk-card-body
+          ul.uk-nav.uk-nav-default
+            li
+              a(uk-toggle="target: #edit_profile") редактирование
+            li
+              a пароль
+            li
+              a портфолио
+      #edit_profile.uk-container-small
+        h2.uk-heading-divider Редактировать профиль
+        form(method="post" action='/register' + Ses.user.id enctype="multipart/form-data")
+          .uk-margin
+            input.uk-input(type="text" placeholder="Имя" name="FirstName" value=Ses.user.FirstName)        
+          .uk-margin
+            input.uk-input(type="text" placeholder="Фамилия" name="LastName" value=Ses.user.LastName)
+          .uk-margin
+            input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" value=Ses.user.PhoneNumber)
+          .uk-margin
+            select.uk-select(name="city")
+              option Воронеж
+              option Бобров
+              option Богучар
+              option Бутурлиновка
+              option Калач
+              option Лиски
+              option Нововоронеж
+              option Новохопёрск
+              option Острогожск
+              option Павловск
+              option Поворино
+              option Россошь
+              option Семилуки
+              option Эртиль    
+            legend.uk-margin-top.uk-legend Какие услуги вы предоставляете
+            ul.uk-list(uk-accordion="multiple: true")
+              each val, i in uslugi
+                li
+                  h3.uk-accordion-title= uslugi[i].cat
+                  .uk-accordion-content
+                    input.uk-hidden.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][cat]" value=uslugi[i].id)
+                    ul
+                      each val, k in uslugi[i].sub_cat
+                        li 
+                          label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat][key]" value=uslugi[i].sub_cat[k].key)] #{uslugi[i].sub_cat[k].name}
+                          input.uk-margin-small-left#sprice(type="number" placeholder="Цена от" name="uslugi["+i+"][sub_cat][sprice]" value=uslugi[i].sub_cat[k].sprice disabled)
+              .uk-margin-top
+                label #[input.uk-checkbox(type="checkbox" name="go_out" value="true")] Выезжаю к клиенту
+              textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
+          button.uk-button(type="submit") Изменить
+      #portfolio.uk-container-small
+        
+  //- if Ses.user.role == 'client'
+  //-   include dash_client.pug
+  //- else if Ses.user.role == 'master'
+  //-   include dash_master.pug
         

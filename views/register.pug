@@ -3,43 +3,49 @@ extends layout
 block content
   script
     include ../public/javascripts/register.js
-  .uk-container.uk-container-small
-    form(method="post" action='/register' enctype="multipart/form-data")
-      legend.uk-legend Зарегистрироваться
-      .uk-margin
-        input.uk-input.uk-input-large(type="text" placeholder="Имя пользователя" name="username" required)
-      .uk-margin
-        input.uk-input(type="password" placeholder="Пароль" name="password" )
-      .uk-margin
-        input.uk-input(type="text" placeholder="Имя" name="FirstName" )        
-      .uk-margin
-        input.uk-input(type="text" placeholder="Фамилия" name="LastName" )
-      .uk-margin
-        input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" )      
-      .uk-margin
-        input.uk-input(type="email" placeholder="E-mail" name="Email" )
-      .uk-margin
-        select.uk-select(name="city")
-          option Воронеж
-      .uk-margin
-        label #[input.uk-radio(type="radio" name="role" value="master" uk-toggle="target: #uslugi" checked)] Я мастер          
-        label #[input.uk-radio(type="radio" name="role" value="client" uk-toggle="target: #uslugi")] Я клиент
-      #uslugi
-        legend.uk-legend Какие услуги вы предоставляете
-        .uk-margin.uk-grid-small.uk-child-width-auto.uk-grid
-          ul(uk-accordion)
+  .uk-section.uk-section-muted
+    .uk-container.uk-container-small.uk-background-default.uk-padding-large
+      form(method="post" action='/register' enctype="multipart/form-data")
+        legend.uk-legend Зарегистрироваться
+        .uk-margin
+          input.uk-input.uk-input-large(type="text" placeholder="Имя пользователя" name="username" required)
+        .uk-margin
+          input.uk-input(type="password" placeholder="Пароль" name="password")
+        .uk-margin
+          input.uk-input(type="text" placeholder="Имя" name="FirstName" )        
+        .uk-margin
+          input.uk-input(type="text" placeholder="Фамилия" name="LastName" )
+        .uk-margin
+          input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" )      
+        .uk-margin
+          input.uk-input(type="email" placeholder="E-mail" name="Email" )
+        .uk-margin
+          select.uk-select(name="city")
+            option Воронеж
+            option Бобров
+            option Богучар
+            option Бутурлиновка
+            option Калач
+            option Лиски
+            option Нововоронеж
+            option Новохопёрск
+            option Острогожск
+            option Павловск
+            option Поворино
+            option Россошь
+            option Семилуки
+            option Эртиль    
+          legend.uk-margin-top.uk-legend Какие услуги вы предоставляете
+          ul.uk-list(uk-accordion="multiple: true")
             each val, i in uslugi
               li
-                h3.uk-accordion-title= uslugi[i].cat
+                h3.uk-accordion-title= uslugi[i].name
                 .uk-accordion-content
-                  input.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][cat]" value=uslugi[i].id)
+                  input.uk-hidden.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][name]" value=uslugi[i].id)
                   ul
                     each val, k in uslugi[i].sub_cat
-                      li 
-                        label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat][key]" value=uslugi[i].sub_cat[k].key)] #{uslugi[i].sub_cat[k].name}
-                        input#sprice(type="number" placeholder="Цена от" name="uslugi["+i+"][sub_cat][sprice]" value=uslugi[i].sub_cat[k].sprice disabled)
-        .uk-margin
-          textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
-        .uk-margin
-            input(type="file" name="avatar")
-      button.uk-button(type="submit") Submit
+                      li
+                        label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat]" value=uslugi[i].sub_cat[k].id)] #{uslugi[i].sub_cat[k].name}
+          label #[input.uk-checkbox(type="checkbox" name="go_out" value="true")] Выезжаю к клиенту
+            textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
+        button.uk-button(type="submit") Регистрация
