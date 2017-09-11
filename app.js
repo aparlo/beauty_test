@@ -100,6 +100,7 @@ function loadUser(req, res, next){
 app.use('/', function(req, res, next){
   model.Cat.find()
   .populate('sub_cat')
+  .sort({'name':1})
   .exec(function(err, uslugi) {
     res.locals.uslugi = uslugi
     next()

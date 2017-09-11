@@ -16,3 +16,26 @@ $(document).ready(function(){
     console.log(n)
   });
 });
+
+// $(document).ready(function(){
+//   $("input").on("change", function(){
+//     if ($("input.address").is(":checked")){
+//       $("#address").show()
+//     }
+//     else {
+//       $("#address").hide()
+//     }
+//   })
+// });
+
+$(document).ready(function(){
+  $("select").on("change", function(){
+    var city = $("#city option:selected").text();
+    if (city == "Воронеж") {
+      $("#my_region").show()
+    }
+    else {
+      $("#my_region").hide()
+    }
+  })
+});

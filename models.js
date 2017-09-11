@@ -3,7 +3,8 @@ var Schema = mongoose.Schema;
 
 var catSchema = new Schema({
   'name':String,
-  'sub_cat': [{type: Schema.Types.ObjectId, ref:'Uslugi'}]
+  'sub_cat': [{type: Schema.Types.ObjectId, ref:'Uslugi'}],
+  '_sort': Number
 })
 
 // var sub_catSchema = new Schema({
@@ -22,6 +23,7 @@ var uslugiSchema = new Schema({
 })
 
 var userSchema = new Schema({
+  'date_registered': {type: Date, default: Date.now}
   'username': {type: String, required: true, index: {unique:true}},
   'password': {type: String, required: true},
   'FirstName': {type: String},
@@ -37,12 +39,13 @@ var userSchema = new Schema({
   'city': String,
   'portfolio': [],
   'Reviews': [],
-  'peresvon': String,
+  'peresvon': Number,
   'go_out': Boolean
 })
 
 var orderSchema = new Schema({
   'OrderName': {type: String, requires: true},
+  'OrderDate': {type: String, requires: true},
   'OrderCustomer': String,
   'OrderVotes': [], //сюда помещается предложения исполнителей как объекты.
   'OrderStatus': {type:String, default:'new'},

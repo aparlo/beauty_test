@@ -1,14 +1,12 @@
 nav(class="uk-navbar-container" uk-navbar)
   .uk-navbar-left
     a(class="uk-navbar-item uk-logo" href="/") TheTopMasters
-  .uk-navbar-left
+  .uk-navbar-center
     ul.uk-navbar-nav.uk-nav-defaut(uk-nav)
       li
-        each val, i in uslugi
-          li
-            a(href="/filter/" + uslugi[i].id) #{uslugi[i].name}
-      li.uk-parent(uk-nav)
-        a.uk-navbar-toggle(uk-navbar-toggle-icon uk-toggle="target: #nav_advance" href="" )
+        a(href="/catalog") Каталог
+      li
+        a(href="/catalog") Найти мастера
   .uk-navbar-right
     a.uk-button.uk-button-secondary.uk-margin-right( href="/register") Стать мастером
     .uk-margin-right
