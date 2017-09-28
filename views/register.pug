@@ -8,6 +8,10 @@ block content
       form(method="post" action='/register' enctype="multipart/form-data")
         legend.uk-legend Зарегистрироваться
         .uk-margin
+          input.uk-input.uk-input-large(type="text" placeholder="Имя пользователя" name="username" required)
+        .uk-margin
+          input.uk-input(type="password" placeholder="Пароль" name="password" )
+        .uk-margin
           input.uk-input(type="text" placeholder="Имя" name="FirstName" )        
         .uk-margin
           input.uk-input(type="text" placeholder="Фамилия" name="LastName" )
@@ -15,8 +19,6 @@ block content
           input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" )      
         .uk-margin
           input.uk-input(type="email" placeholder="E-mail" name="Email" )
-        .uk-margin
-          input.uk-input.uk-input-large(type="text" placeholder="Имя пользователя" name="username" required)
         .uk-margin
           select.uk-select(name="city")
             option Воронеж
@@ -39,7 +41,7 @@ block content
               li
                 h3.uk-accordion-title= uslugi[i].name
                 .uk-accordion-content
-                  input.uk-hidden.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][name]" value=uslugi[i].id)
+                  input.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][name]" value=uslugi[i].id)
                   ul
                     each val, k in uslugi[i].sub_cat
                       li

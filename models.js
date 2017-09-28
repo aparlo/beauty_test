@@ -23,9 +23,9 @@ var uslugiSchema = new Schema({
 })
 
 var userSchema = new Schema({
-  'date_registered': {type: Date, default: Date.now}
+  'date_registered': {type: Date, default: Date.now},
   'username': {type: String, required: true, index: {unique:true}},
-  'password': {type: String, required: true},
+  'password': {type: String},
   'FirstName': {type: String},
   'LastName': {type: String},
   'PhoneNumber': {type: String},
@@ -36,20 +36,33 @@ var userSchema = new Schema({
   'avatar': { data: Buffer, contentType: String },
   'uslugi': [master_uslugiSchema],
   'rating': Number,
-  'city': String,
+  'address': {
+    city: String,
+    district: String},
   'portfolio': [],
   'Reviews': [],
-  'peresvon': Number,
-  'go_out': Boolean
+  'call_back_time': Number,
+  'go_out': Boolean,
+  'order_status': String
 })
 
 var orderSchema = new Schema({
-  'OrderName': {type: String, requires: true},
-  'OrderDate': {type: String, requires: true},
-  'OrderCustomer': String,
-  'OrderVotes': [], //сюда помещается предложения исполнителей как объекты.
-  'OrderStatus': {type:String, default:'new'},
-  'OrderMaster': String
+  'name': {type: Schema.Types.ObjectId, ref:'Uslugi'},
+  'number': {type: String},
+  'date_desire': {type: Date},
+  'time_desire': String,
+  'address': {
+    city: String,
+    district: String},
+  'date_registered': { type: Date, default: Date.now },
+  'customer': {type: Schema.Types.ObjectId, ref:'User'},
+  'votes': [{
+    master: {type: Schema.Types.ObjectId, ref:'User'},
+    price: Number,
+    time: String}], //сюда помещается предложения исполнителей как объекты.
+  'status': {type:String, default:'new'},
+  'master': {type: Schema.Types.ObjectId, ref:'User'},
+  'place': String
 })
 
 module.exports.Names = mongoose.model('Names', {

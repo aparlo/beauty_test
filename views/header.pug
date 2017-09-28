@@ -1,20 +1,75 @@
 nav(class="uk-navbar-container" uk-navbar)
   .uk-navbar-left
-    a(class="uk-navbar-item uk-logo" href="/") TheTopMasters
-  .uk-navbar-center
-    ul.uk-navbar-nav.uk-nav-defaut(uk-nav)
+    a(class="uk-navbar-item uk-logo" href="/") #[img(src="../images/logo_long.svg" style="height: 20%")]
+  if !Ses
+    .uk-navbar-center
+      ul.uk-navbar-nav.uk-nav-defaut(uk-nav)
+        li
+          a(href="/catalog") Каталог
+        li
+          a(href="/catalog") Найти мастера
+    .uk-navbar-right
+      a.uk-button.uk-button-secondary.uk-margin-right( href="/register") Стать мастером
+      .uk-margin-right
+        span.uk-margin-small-right(uk-icon="icon: sign-in")
+        if !Ses
+          a.uk-button.uk-button-text(href="/login") Войти
+  else
+    case Ses.user.role
+      when 'master'
+        .uk-navbar-center
+          ul.uk-navbar-nav(uk-switcher="connect: .switch")
+            li
+              a Заказы #[span.uk-badge.uk-margin-right #{orders.length}]
+            li
+              a Редактирование профиля
+            li
+              a Сменить пароль
+            li
+              a Портфолио
+            li
+              a Мой Счет
+        .uk-navbar-right
+          .uk-margin-right
+            span.uk-margin-small-right(uk-icon="icon: sign-in")
+            a.uk-button.uk-button-text(href="/logout") Выход
+      when 'client'
+        .uk-navbar-center
+          ul.uk-navbar-nav(uk-switcher="connect: .switch"  class='uk-visible@m')
+            li
+              a Заказы
+            li
+              a Новый заказ
+            li
+              a Редактирование профиля
+            li
+              a Сбросить пароль
+          a.uk-navbar-toggle(uk-navbar-toggle-icon class="uk-hidden@m" uk-toggle="target: #mobilemenu" href="")
+        .uk-navbar-right
+          a.uk-button.uk-button-secondary.uk-margin-right(class='uk-visible@l' href="/register") Стать мастером
+          .uk-margin-right
+            span.uk-margin-small-right(uk-icon="icon: sign-in")
+            a.uk-button.uk-button-text(href="/logout") Выход
+#mobilemenu(hidden)
+  nav.uk-navbar-container(uk-navbar="dropbar: true; dropbar-mode: push")
+    ul.uk-navbar-nav.uk-nav-primary.uk-nav-center(class="uk-visible@s" uk-switcher="connect: .switch")
       li
-        a(href="/catalog") Каталог
+        a Заказы
       li
-        a(href="/catalog") Найти мастера
-  .uk-navbar-right
-    a.uk-button.uk-button-secondary.uk-margin-right( href="/register") Стать мастером
-    .uk-margin-right
-      span.uk-margin-small-right(uk-icon="icon: sign-in")
-      if !Ses
-        a.uk-button.uk-button-text(href="/login") Войти
-      else
-        a.uk-link-text(href="/logout") Выход
+        a Новый заказ
+      li
+        a Редактирование профиля
+      li
+        a Сбросить пароль
+  ul.uk-nav.uk-nav-defaut.uk-nav-center(class="uk-hidden@s" uk-switcher="connect: .switch")
+    li
+      a Заказы
+    li
+      a Новый заказ
+    li
+      a Редактирование профиля
+    li
+      a Сбросить пароль
     
 #nav_advance(uk-modal-page hidden)
   .uk-modal-body.uk-background-muted()

@@ -1,0 +1,12 @@
+link(rel='stylesheet' href='/stylesheets/datepicker.css')
+script( src="https://code.jquery.com/jquery-1.12.4.js")
+script( src="https://code.jquery.com/ui/1.12.1/jquery-ui.js")
+script(type="text/javascript" src="/javascripts/datepicker.js")
+
+script
+  include ../public/javascripts/main.js
+form(method='post' action='/date')
+  input(type='text' data-toggle="datepicker" name='date')
+  button(type='submit' name="date") Submit
+  
+input(type='text' data-toggle="datepicker" name='date')

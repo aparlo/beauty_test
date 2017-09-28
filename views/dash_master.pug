@@ -1,70 +1,85 @@
-h2.uk-heading Привет, #{Ses.user.FirstName}!
-h4 С нами с 09.09.2017
+- var options = {year: 'numeric', month: 'numeric', day: 'numeric'}
+
+.uk-hidden.uk-grid(uk-grid).uk-padding.uk-section-expand.uk-height-xsmall
+  h2.uk-heading.uk-width-1-2 Привет, #{Ses.user.FirstName}!
+  h4.uk-width-1-2.uk-text-right Вы с нами с #{Ses.user.date_registered.toLocaleString('ru', options)}
 .uk-section.uk-section-expand.uk-padding-remove-top
-  .uk-padding.uk-position-relative.uk-position-z-index.uk-float-left
-    .uk-card.uk-card-default.uk-card-body.uk-grid 
-      .uk-card.uk-card-default.uk-card-body
-        ul.uk-nav.uk-nav-default
-          li
-            a(uk-toggle="target: #edit_profile") Редактирование
-          li
-            a Сбросить пароль
-          li
-            a Портфолио
-          li
-            a Оплата
-          li
-            a Заказы
-      #edit_profile.uk-container-small(hidden)
-        h2.uk-heading-divider Редактировать профиль
-        form(method="post" action='/register' + Ses.user.id enctype="multipart/form-data")
-          .uk-margin
-            input.uk-input(type="text" placeholder="Имя" name="FirstName" value=Ses.user.FirstName)        
-          .uk-margin
-            input.uk-input(type="text" placeholder="Фамилия" name="LastName" value=Ses.user.LastName)
-          .uk-margin
-            input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" value=Ses.user.PhoneNumber)
-          .uk-margin
-            select.uk-select(name="city")
-              option Воронеж
-              option Бобров
-              option Богучар
-              option Бутурлиновка
-              option Калач
-              option Лиски
-              option Нововоронеж
-              option Новохопёрск
-              option Острогожск
-              option Павловск
-              option Поворино
-              option Россошь
-              option Семилуки
-              option Эртиль    
-            legend.uk-margin-top.uk-legend Какие услуги вы предоставляете
-            ul.uk-list(uk-accordion="multiple: true")
-              each val, i in uslugi
-                li
-                  h3.uk-accordion-title= uslugi[i].name
-                  .uk-accordion-content
-                    input.uk-hidden.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][name]" value=uslugi[i].id)
-                    ul
-                      each val, k in uslugi[i].sub_cat
-                        li
-                          label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat]" value=uslugi[i].sub_cat[k].id)] #{uslugi[i].sub_cat[k].name}
-              .uk-margin-top
-                label #[input.uk-checkbox(type="checkbox" name="go_out" value="true")] Выезжаю к клиенту
-              textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
-          button.uk-button(type="submit") Изменить
-      #portfolio.uk-container-small
+  .uk-padding-large.uk-position-relative.uk-position-z-index.uk-float-left
+      ul.uk-switcher.switch
+        li
+          #orders
+            ul.uk-grid
+              each val, i in orders
+                if orders[i].status == 'new'
+                  li
+                    .uk-card-body.uk-card-default
+                      h3.uk-margin-small Заказ № #{orders[i].number}
+                      h5.uk-margin-small Услуга: #{orders[i].name.name}
+                      h5.uk-margin-small Заказчик: #{orders[i].customer.FirstName} #{orders[i].customer.LastName}
+                      h5.uk-margin-small Дата исполнения: #{orders[i].date_desire.toLocaleString('ru', options)}
+                      if orders[i].place == 'master'
+                        h5.uk-margin-small Выполняется у мастрера
+                      else 
+                        h5.uk-margin-small Выполняется у клиента
+                      p.uk-text-media.uk-margin-remove-top #{orders[i].address.district} район
+                      hr
+                      form(id="#order_vote" method='post', action="/master_vote/" + Ses.user._id + '.' + orders[i].id)
+                        .uk-margin-right
+                          input.uk-input.uk-form-width-small(type="number" placeholder="Цена" name="price")
+                        .uk-margin
+                          button#submit.uk-margin-right.uk-button.uk-button-primary(type="submit") хочу этот заказ
+                          button.uk-button.uk-button-default занят
+        li
+          .uk-container-small().uk-padding-large.uk-background-muted
+            h2.uk-heading-divider Редактировать профиль
+            form(method="post" action='/register' + Ses.user.id enctype="multipart/form-data")
+              .uk-margin
+                input.uk-input(type="text" placeholder="Имя" name="FirstName" value=Ses.user.FirstName)        
+              .uk-margin
+                input.uk-input(type="text" placeholder="Фамилия" name="LastName" value=Ses.user.LastName)
+              .uk-margin
+                input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" value=Ses.user.PhoneNumber)
+              .uk-margin
+                select.uk-select(name="city")
+                  option Воронеж
+                  option Бобров
+                  option Богучар
+                  option Бутурлиновка
+                  option Калач
+                  option Лиски
+                  option Нововоронеж
+                  option Новохопёрск
+                  option Острогожск
+                  option Павловск
+                  option Поворино
+                  option Россошь
+                  option Семилуки
+                  option Эртиль    
+                legend.uk-margin-top.uk-legend Какие услуги вы предоставляете
+                ul.uk-list(uk-accordion="multiple: true")
+                  each val, i in uslugi
+                    li
+                      h3.uk-accordion-title= uslugi[i].name
+                      .uk-accordion-content
+                        input.uk-hidden.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][name]" value=uslugi[i].id)
+                        ul
+                          each val, k in uslugi[i].sub_cat
+                            li
+                              label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat]" value=uslugi[i].sub_cat[k].id)] #{uslugi[i].sub_cat[k].name}
+                  .uk-margin-top
+                    label #[input.uk-checkbox(type="checkbox" name="go_out" value="true")] Выезжаю к клиенту
+                  textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
+              button.uk-button(type="submit") Изменить
+        li  
+          #portfolio.uk-container-small
+            h4 Сбросить пароль
+        li  
+          #portfolio.uk-container-small
+            h4 Портфолио
+        li  
+          #oplata.uk-container-small
+            h4 Оплата
   .uk-panel(style="width:100% !important")
     .uk-section.uk-section-cover(style="width:100% !important; height:100%; background-attachment: fixed; background-position: right center; background-image: url(/images/desk1.jpg)")
     .uk-overlay.uk-overlay-primary.uk-position-cover
       
-.uk-card-body.uk-card-default
-  ul.uk-list
-    each val, i in orders
-      if orders[i].OrderStatus == 'new'
-        li 
-          h4.uk-heading= orders[i].OrderName + ', ' + orders[i].OrderVotes
-            form(method='post', action="/master_vote/" + Ses.user.username + '.' + orders[i].id)
-              input(type='submit', value='Берусь!') 

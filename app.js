@@ -1,21 +1,56 @@
-var express = require('express');
-var session = require('express-session');
-var MongoStore = require('connect-mongo')(session);
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var methodOverride = require('method-override');
-var mongoose = require('mongoose');
-var model = require('./models.js');
-var url = 'mongodb://localhost:27017/testing-new';
-var db = mongoose.connect(url);
-var app = express();
-const multer = require('multer');
-var storage = multer.memoryStorage();
+var express = require('express')
+var request = require('request');
+var https = require('https');
+var session = require('express-session')
+var MongoStore = require('connect-mongo')(session)
+var path = require('path')
+var favicon = require('serve-favicon')
+var logger = require('morgan')
+var cookieParser = require('cookie-parser')
+var bodyParser = require('body-parser')
+var methodOverride = require('method-override')
+var mongoose = require('mongoose')
+var model = require('./models.js')
+var url = 'mongodb://localhost:27017/testing-new'
+var db = mongoose.connect(url)
+var app = express()
+const multer = require('multer')
+var storage = multer.memoryStorage()
 var upload = multer({storage: storage})
 var nodemailer = require('nodemailer')
+
+
+
+//test sms_token
+var sms_token = 'a7042f981e8f5c3c9b9120c9a1c3b19f017892e97393aff66e27035c503af2643271b5dc2f43a4f83017266587d6916a004a4b82a39b9764209ef563558207d7'
+
+function Send_sms_reg(phone, msg) {
+  var uri = 'https://api.smsworldhub.com/v1/send?'+'token='+sms_token+'&phone='+phone+'&mes=Для продолжения регистрации на сайте thetopmasters.ru, введите код: 1124'
+  var options = { method: 'GET',
+    url: 'https://api.smsworldhub.com/v1/send',
+    qs:
+     { token: 'a7042f981e8f5c3c9b9120c9a1c3b19f017892e97393aff66e27035c503af2643271b5dc2f43a4f83017266587d6916a004a4b82a39b9764209ef563558207d7',
+       phone: phone,
+       mes: 'Для продолжения регистрации на сайте thetopmasters.ru, введите код:'+msg },
+    headers:
+     { 'postman-token': '7b8fa2d5-22f4-9d8e-33cb-e8f337e2b0b1',
+       'cache-control': 'no-cache' } };
+  request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+  console.log(body);
+})
+}
+
+
+// setup email data with unicode symbols
+let mailOptions = {
+    from: '"Fred Foo 👻" <aparlo@yandex.ru>', // sender address
+    to: 'aparlo@icloud.com, parlobox@gmail.com', // list of receivers
+    subject: 'Hello ✔', // Subject line
+    text: 'Hello world ?', // plain text body
+    html: '<b>Hello world ?</b>' // html body
+}
 
 // create reusable transporter object using the default SMTP transport
 let transporter = nodemailer.createTransport({
@@ -27,15 +62,6 @@ let transporter = nodemailer.createTransport({
         pass: '2ba31'
     }
 })
-
-// setup email data with unicode symbols
-let mailOptions = {
-    from: '"Fred Foo 👻" <aparlo@yandex.ru>', // sender address
-    to: 'aparlo@icloud.com, parlobox@gmail.com', // list of receivers
-    subject: 'Hello ✔', // Subject line
-    text: 'Hello world ?', // plain text body
-    html: '<b>Hello world ?</b>' // html body
-}
 
 // send mail with defined transport object
 // transporter.sendMail(mailOptions, (error, info) => {
@@ -63,13 +89,43 @@ app.use(session({
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
+function genPass(req, res, next) {
+  var chars = "abcdefghijklmnopqrstuvwxyz1234567890";
+  var pass = "";
+  for (var x = 0; x < 3; x++) {
+      var i = Math.floor(Math.random() * chars.length);
+      pass += chars.charAt(i);
+  }
+  req.password = '111';
+  console.log(pass);
+  Send_sms_reg(req.body.PhoneNumber, req.password)
+  next()
+}
+function genNumber(req, res, next) {
+  var chars = "ABCDEFGHIJKLMNOP";
+  var nums = "1234567890"
+  var number = "";
+  for (var x = 0; x < 3; x++) {
+      var i = Math.floor(Math.random() * chars.length);
+      number += chars.charAt(i);
+  }
+  number += '-'
+  for (var x = 0; x < 4; x++) {
+      var i = Math.floor(Math.random() * nums.length);
+      number += nums.charAt(i);
+  }
+  req.number = number;
+  console.log('Order number is: ' + number);
+  next()
+}
+
 function loginUser(req, res, next) {
   model.User.findOne({username: req.body.username}, function(err, user){
     if(!user) {
       res.render('login', {error: 'No username found'});
     } else{
       if (req.body.password === user.password) {
-        req.session.user = user.username;
+        req.session.user = user;
         req.session.userrole = user.role;
         console.log('Session: ' + req.session.user + ',' + req.session.userrole);
         next();
@@ -83,7 +139,7 @@ function loginUser(req, res, next) {
 function loadUser(req, res, next){
   console.log('Verifing session...');
   if (req.session && req.session.id){
-    model.User.findOne({username: req.session.user}, function(err, user){
+    model.User.findOne({username: req.session.user.username}, function(err, user){
       if(!user) {
         req.session.destroy();
         res.redirect('/login');
@@ -105,6 +161,11 @@ app.use('/', function(req, res, next){
     res.locals.uslugi = uslugi
     next()
   })
+})
+
+app.get('/send_sms', function(req, res) {
+  Send_sms('89204049343', '111')
+  res.send('send_sms')
 })
 
 //Uslugi Show, Edit, Add
@@ -153,9 +214,24 @@ app.get('/', function(req, res){
   })
 })
 
+app.get('/master_card:_id', function(req, res){
+  model.User.findOne({_id:req.params._id}).populate({
+    path:'uslugi.name',
+    select:'name',
+    model:'Cat'
+  }).exec(function(err, docs){
+    model.User.populate(docs, {
+      path:'uslugi.sub_cat',
+      model:'Uslugi'
+    }, function(err, docs) {
+      console.log(docs);
+          return res.send(docs)
+    })
+  })
+})
 
 //Filter
-app.get('/filter/:usluga', function(req, res){
+app.get('/catalog/:usluga', function(req, res){
   var usluga = req.params.usluga
   console.log('Выбрана' + usluga)
   model.Uslugi.findOne({_id:usluga}, function(err, usluga){
@@ -185,7 +261,7 @@ app.get('/login', function(req, res, next){
 
 app.get('/logout', function(req, res, next){
   req.session.destroy;
-  res.redirect('/login');
+  res.redirect('/');
 });
 
 //Register
@@ -193,8 +269,48 @@ app.get('/register', function(req, res, next){
   res.render('register')
 })
 
+app.get('/date',  function(req, res, next){
+  res.render('date')
+})
+
+app.post('/date', function(req, res, next){
+  console.log(req.body)
+})
+
+app.post('/register_order', genPass, genNumber, function(req, res, next) {
+  var User = new model.User
+  User._id = new mongoose.Types.ObjectId()
+  User.password = req.password
+  User.username = req.body.Email
+  User.FirstName = req.body.FirstName
+  User.LastName = req.body.LastName
+  User.PhoneNumber = req.body.PhoneNumber
+  User.Email = req.body.Email
+  User.role = 'client'
+  User.status = 'blocked'
+  User.order_status = 'active'
+  User.save(function(err, client){
+    if (err) console.log(err)
+    var Order = new model.Order
+    Order.name = req.body.OrderName
+    Order.number = req.number
+    Order.date_desire = req.body.OrderDate
+    Order.time_desire = req.body.OrderTime
+    Order.customer = User._id
+    Order.place = req.body.place
+    Order.address.city = req.body.city
+    Order.address.district = req.body.district
+    Order.status = 'new'
+    Order.save(function(err, order){
+      if (err) console.log(err)
+      return res.send(User)
+    })
+  })
+})
+
+
 app.post('/register', upload.single('avatar'), function(req, res, next) {
-  console.log(req.body.uslugi);
+  console.log(req.body.username);
   var uslugi = Array.prototype.slice.call(req.body.uslugi)
   var User = new model.User
   User.username = req.body.username
@@ -207,7 +323,7 @@ app.post('/register', upload.single('avatar'), function(req, res, next) {
   User.about =  req.body.about
   User.status = 'active'
   User.uslugi = uslugi
-  User.city = req.body.city
+  User.address.city = req.body.city
   User.go_out = req.body.go_out
   User.save(function (err, master) {
     if (err) console.log(err)
@@ -263,39 +379,45 @@ app.get('/users', function(req, res, next){
 
 
 //Orders
-app.post('/new_order', loadUser, function(req, res) {
-  var NewOrder = new model.Order({
-      OrderName: req.body.OrderName,
-      OrderCustomer: req.session.user,
-  });
-  NewOrder.save(function(err, uDocs){
-    console.log(uDocs);
-    res.redirect('/dashboard');
-  });
+app.post('/new_order', genNumber, loadUser, function(req, res) {
+  var Order = new model.Order
+  Order.name = req.body.OrderName
+  Order.number = req.number
+  Order.date_desire = req.body.OrderDate
+  Order.time_desire = req.body.OrderTime
+  Order.customer = res.locals.Ses.user.id
+  Order.place = req.body.place
+  Order.address.city = req.body.city
+  Order.address.district = req.body.district
+  Order.status = 'new'
+  Order.save(function(err, order){
+    if (err) console.log(err)
+    return res.send('200')
+  })
 });
 
 /* MasteVote. */
 app.post('/master_vote/:mastername.:orderid', function(req, res) {
   model.Order.findByIdAndUpdate(
     req.params.orderid,
-    {$addToSet: {OrderVotes:req.params.mastername}},
+    {$addToSet: {votes:{master:req.params.mastername, price:req.body.price}}},
     {safe: true, upsert: true},
     function(err, order_vote){
-      console.log('New Vote');
-      res.redirect('/dashboard');
+      if (err) console.log(err);
     }
   )
 });
 
 /* ClientVote. */
 app.post('/client_vote/:mastername.:orderid', function(req, res) {
+  console.log(req.body.price);
   model.Order.findByIdAndUpdate(
     req.params.orderid,
-    {$set: {OrderMaster:req.params.mastername, OrderStatus:'in_progress'}},
+    {$addToSet: {master:req.params.mastername, status:'in_progress'}},
     {safe: true, upsert: true},
     function(err, order_vote){
       console.log('Mater Vote');
-      res.redirect('/dashboard', {OrderStatus:'in_progress'});
+      ;
     }
   )
 });
@@ -310,19 +432,32 @@ app.get('/session', loadUser, function(req, res, next){
 app.get('/dashboard', loadUser, function(req, res, next){
   console.log('Dashboard!')
   if (req.session.userrole == 'client') {
-    console.log('User is cleint!');
-    model.Order.find({OrderCustomer:req.session.user}, function(err, docs){
-      // console.log(docs);
+    model.Order
+    .find({customer:req.session.user._id})
+    .populate('name customer votes.master')
+    .exec(function(err, docs){
       res.render('dashboard', {orders:docs});
-    })
+      })
   } else if (req.session.userrole == 'master'){
     console.log('User is master!');
-    model.Order.find({}, function(err, docs){
-      console.log(docs);
+    model.Order
+    .find({})
+    .populate('name customer')
+    .exec(function(err, docs){
       res.render('dashboard', {orders:docs});
     })
   }
 });
+
+
+//Statics
+app.get('/contacts', function(req, res, next){
+  res.render('contacts')
+})
+
+app.get('/offert', function(req, res, next){
+  res.render('offert')
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
