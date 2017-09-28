@@ -43,7 +43,11 @@ var userSchema = new Schema({
   'Reviews': [],
   'call_back_time': Number,
   'go_out': Boolean,
-  'order_status': String
+  'order_status': String,
+  'orders_voted': [{
+    order:{type: Schema.Types.ObjectId, ref:'Order'},
+    price:{}
+  }]
 })
 
 var orderSchema = new Schema({

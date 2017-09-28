@@ -10,6 +10,7 @@ block content
           legend.uk-legend Найти мастера
           p.uk-text-media Здесь Вы можете сделать заказ на стрижку, маникюр, педикюр и другие услуги по уходу за собой
           .uk-width-1-1
+            label.uk-margin-remove-bottom Выберите услугу:
             select.uk-input(type="text" placeholder="Я хочу сделать..." name="OrderName" required)
               each val, i in uslugi
                 optgroup(label=val.name value=uslugi[i].id)
@@ -88,9 +89,7 @@ block content
           h3 Косметология
           p красивые брови, макияж и долгие свежесть и молодость
   .uk-section-expand
-    ul
-      each val, i in masters
-        li= val
+
   #login_modal(uk-modal)
     .uk-modal-dialog
         .uk-modal-body

@@ -23,12 +23,19 @@
                         h5.uk-margin-small Выполняется у клиента
                       p.uk-text-media.uk-margin-remove-top #{orders[i].address.district} район
                       hr
-                      form(id="#order_vote" method='post', action="/master_vote/" + Ses.user._id + '.' + orders[i].id)
-                        .uk-margin-right
-                          input.uk-input.uk-form-width-small(type="number" placeholder="Цена" name="price")
-                        .uk-margin
-                          button#submit.uk-margin-right.uk-button.uk-button-primary(type="submit") хочу этот заказ
-                          button.uk-button.uk-button-default занят
+                      - var voted = [];
+                      each val in orders[i].votes
+                        - voted.push(val.master);
+                        if voted.indexOf(Ses.user._id)
+                          p Вы уже откликнулись на этот заказ
+                        //- -var idx = val.master.indexOf(Ses.user._id)
+                        else
+                          form(id="#order_vote" method='post', action="/master_vote/" + Ses.user._id + '.' + orders[i].id)
+                            .uk-margin-right
+                              input.uk-input.uk-form-width-small(type="number" placeholder="Цена" name="price")
+                            .uk-margin
+                              button#submit.uk-margin-right.uk-button.uk-button-primary(type="submit") хочу этот заказ
+                              button.uk-button.uk-button-default занят
         li
           .uk-container-small().uk-padding-large.uk-background-muted
             h2.uk-heading-divider Редактировать профиль
