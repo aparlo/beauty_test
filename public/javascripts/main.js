@@ -118,6 +118,7 @@ $(document).ready(function(){
       });
     })
 });
+
 //New order submit
 $(document).ready(function(){
   $("#new_order")

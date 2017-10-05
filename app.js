@@ -231,18 +231,35 @@ app.get('/master_card:_id', function(req, res){
 })
 
 //Filter
-app.get('/catalog/:usluga', function(req, res){
+app.get('/catalog:usluga', function(req, res){
   var usluga = req.params.usluga
   console.log('Выбрана' + usluga)
   model.Uslugi.findOne({_id:usluga}, function(err, usluga){
     model.User.find({"uslugi.cat":usluga.id}, function(err, docs) {
       console.log(docs.username + '' + usluga)
-      res.render('index', {masters: docs});
+      res.render('catalog', {masters: docs});
     })
   })
 });
 
-
+app.get('/catalog', function(req, res){
+    model.User
+    .find({'role':'master'})
+    .populate({
+      path:'uslugi.name',
+      select:'name',
+      model:'Cat'
+      })
+    .sort('uslugi.sub_cat')
+    .exec(function(err, docs) {
+      model.User.populate(docs, {
+          path:'uslugi.sub_cat',
+          model:'Uslugi'
+        }, function(err, docs) {
+          res.render('catalog', {masters: docs});
+        })
+  })
+});
 
 // SignUp
 app.get('/signin', function(req, res, next) {
@@ -455,8 +472,15 @@ app.get('/contacts', function(req, res, next){
   res.render('contacts')
 })
 
+app.get('/masteram', function(req, res, next){
+  res.render('masteram')
+})
+
 app.get('/offert', function(req, res, next){
   res.render('offert')
+})
+app.get('/partneram', function(req, res, next){
+  res.render('partneram')
 })
 
 // catch 404 and forward to error handler

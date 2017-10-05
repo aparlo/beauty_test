@@ -51,8 +51,8 @@
                               button.uk-button Выбрать мастера
                         
         li
-          if Ses.user.order_status == 'active'
-            .uk-card.uk-card-default.uk-card-body.uk-width-1-3
+          if Ses.user.order_status == 'inactive'
+            .uk-card.uk-card-default.uk-card-body
               form#new_order.uk-grid.uk-grid-small(method="post" action='/new_order' uk-grid)
                 legend.uk-legend Новый заказ
                 p.uk-text-media Здесь Вы можете сделать заказ на стрижку, маникюр, педикюр и другие услуги по уходу за собой

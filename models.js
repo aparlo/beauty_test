@@ -35,7 +35,11 @@ var userSchema = new Schema({
   'about': String,
   'avatar': { data: Buffer, contentType: String },
   'uslugi': [master_uslugiSchema],
-  'rating': Number,
+  'rating': [{
+    likes:{type: Schema.Types.ObjectId, ref:'User'},
+    dislikes:{type: Schema.Types.ObjectId, ref:'User'},
+    rating:{type: Number}
+    }],
   'address': {
     city: String,
     district: String},

@@ -1,0 +1,22 @@
+extends layout
+
+block content
+
+  .uk-section-large.uk-section-muted
+    .uk-container
+      .uk-grid.uk-grid-margin-medium(uk-grid)
+        each val,i in masters
+          .uk-card.uk-card-body.uk-card-default.uk-width-1-4
+            h3= val.FirstName + ' ' + val.LastName
+            hr
+            h3 Услуги мастера:
+            ul
+              each val, k in masters[i].uslugi
+                if val != null
+                  li= val.name.name
+                    ul
+                      each val, j in masters[i].uslugi[k].sub_cat
+                        if val != null
+                          li= val.name
+                        else
+                else

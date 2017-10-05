@@ -26,7 +26,8 @@
                       - var voted = [];
                       each val in orders[i].votes
                         - voted.push(val.master);
-                        if voted.indexOf(Ses.user._id)
+                        - votedidx = voted.indexOf(Ses.user._id)
+                        if idx == -1
                           p Вы уже откликнулись на этот заказ
                         //- -var idx = val.master.indexOf(Ses.user._id)
                         else
