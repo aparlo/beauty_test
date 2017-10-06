@@ -1,6 +1,6 @@
 - var options = {year: 'numeric', month: 'numeric', day: 'numeric'}
 
-.uk-hidden.uk-grid(uk-grid).uk-padding.uk-section-expand.uk-height-xsmall
+.uk-grid(uk-grid).uk-padding.uk-section-expand.uk-height-xsmall
   h2.uk-heading.uk-width-1-2 Привет, #{Ses.user.FirstName}!
   h4.uk-width-1-2.uk-text-right Вы с нами с #{Ses.user.date_registered.toLocaleString('ru', options)}
 .uk-section.uk-section-expand.uk-padding-remove-top
@@ -24,19 +24,22 @@
                       p.uk-text-media.uk-margin-remove-top #{orders[i].address.district} район
                       hr
                       - var voted = [];
+                      if orders[i].votes != 0
+                        p Голосов: #{orders[i].votes.length}
+                      else
+                        p Вы будете первым кто откликнется
                       each val in orders[i].votes
-                        - voted.push(val.master);
-                        - votedidx = voted.indexOf(Ses.user._id)
-                        if idx == -1
-                          p Вы уже откликнулись на этот заказ
-                        //- -var idx = val.master.indexOf(Ses.user._id)
-                        else
-                          form(id="#order_vote" method='post', action="/master_vote/" + Ses.user._id + '.' + orders[i].id)
-                            .uk-margin-right
-                              input.uk-input.uk-form-width-small(type="number" placeholder="Цена" name="price")
-                            .uk-margin
-                              button#submit.uk-margin-right.uk-button.uk-button-primary(type="submit") хочу этот заказ
-                              button.uk-button.uk-button-default занят
+                        - voted.push(val.master.toString());
+                      - var idx = voted.indexOf(Ses.user.id.toString())
+                      if idx != -1
+                        p Вы уже откликнулись на этот заказ
+                      else
+                        form(id="order_vote" method='POST' action="/master_vote/" + Ses.user.id + '.' + orders[i].id)
+                          .uk-margin-right
+                            input.uk-input.uk-form-width-small(type="number" placeholder="Цена" name="price")
+                          .uk-margin
+                            button.submit.uk-margin-right.uk-button.uk-button-primary(type='submit') хочу этот заказ
+                            button.uk-button.uk-button-default(type="button") занят
         li
           .uk-container-small().uk-padding-large.uk-background-muted
             h2.uk-heading-divider Редактировать профиль

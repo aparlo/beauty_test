@@ -119,6 +119,8 @@ $(document).ready(function(){
     })
 });
 
+//New orders
+
 //New order submit
 $(document).ready(function(){
   $("#new_order")
@@ -136,19 +138,21 @@ $(document).ready(function(){
     })
 });
 
-$(document).ready(function(){
-  console.log('ready');
-  $("#submit").click(function(){
-    console.log('clicked');
+$(document).ready(function(orders_new){
+  $("#orders .submit").click(function(){
+    $(this).html('Value')
     $(this).closest("form")
-      alert('Found@')
       .submit(function(event){
         event.preventDefault()
+        var action = $(this).attr('action')
+        console.log(action);
+        console.log(orders.length);
         $.ajax({
-            url: $("#order_vote").attr('action'),
+            url: $(this).attr('action'),
             type: 'POST',
-            data: $("#order_vote").serialize(),
+            data: $(this).serialize(),
             success: function(result) {
+              alert('Вы откликнулись на заказ')
             }
         });
       })

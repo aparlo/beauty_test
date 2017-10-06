@@ -18,6 +18,7 @@ const multer = require('multer')
 var storage = multer.memoryStorage()
 var upload = multer({storage: storage})
 var nodemailer = require('nodemailer')
+var io = require('socket.io');
 
 
 
@@ -209,7 +210,7 @@ app.get('/', function(req, res){
       path:'uslugi.sub_cat',
       model:'Uslugi'
     }, function(err, docs) {
-          res.render('index', {masters: docs})
+          res.render('index', {title:'Найти мастера или сделать заказ', masters: docs})
     })
   })
 })
@@ -421,6 +422,7 @@ app.post('/master_vote/:mastername.:orderid', function(req, res) {
     {safe: true, upsert: true},
     function(err, order_vote){
       if (err) console.log(err);
+      res.status(200).redirect('/dashboard')
     }
   )
 });
@@ -461,7 +463,7 @@ app.get('/dashboard', loadUser, function(req, res, next){
     .find({})
     .populate('name customer')
     .exec(function(err, docs){
-      res.render('dashboard', {orders:docs});
+      res.render('dashboard', {callb:'Новый заказ', orders:docs});
     })
   }
 });
