@@ -479,6 +479,7 @@ app.get('/masteram', function(req, res, next){
 app.get('/offert', function(req, res, next){
   res.render('offert')
 })
+
 app.get('/partneram', function(req, res, next){
   res.render('partneram')
 })
