@@ -1,4 +1,5 @@
 var express = require('express')
+var socket_io    = require("socket.io")
 var request = require('request');
 var https = require('https');
 var session = require('express-session')
@@ -18,7 +19,8 @@ const multer = require('multer')
 var storage = multer.memoryStorage()
 var upload = multer({storage: storage})
 var nodemailer = require('nodemailer')
-var io = require('socket.io');
+var io = socket_io()
+app.io = io
 
 
 
@@ -215,6 +217,7 @@ app.get('/', function(req, res){
   })
 })
 
+
 app.get('/master_card:_id', function(req, res){
   model.User.findOne({_id:req.params._id}).populate({
     path:'uslugi.name',
@@ -231,6 +234,7 @@ app.get('/master_card:_id', function(req, res){
   })
 })
 
+
 //Filter
 app.get('/catalog:usluga', function(req, res){
   var usluga = req.params.usluga
@@ -242,6 +246,7 @@ app.get('/catalog:usluga', function(req, res){
     })
   })
 });
+
 
 app.get('/catalog', function(req, res){
     model.User
@@ -262,38 +267,46 @@ app.get('/catalog', function(req, res){
   })
 });
 
+
 // SignUp
 app.get('/signin', function(req, res, next) {
   res.render('signin')
 })
+
 
 //Login
 app.post('/login', loginUser, function(req, res){
   res.redirect('/dashboard');
 });
 
+
 app.get('/login', function(req, res, next){
   res.locals.User = req.session;
   res.render('login');
 });
+
 
 app.get('/logout', function(req, res, next){
   req.session.destroy;
   res.redirect('/');
 });
 
+
 //Register
 app.get('/register', function(req, res, next){
   res.render('register')
 })
 
+
 app.get('/date',  function(req, res, next){
   res.render('date')
 })
 
+
 app.post('/date', function(req, res, next){
   console.log(req.body)
 })
+
 
 app.post('/register_order', genPass, genNumber, function(req, res, next) {
   var User = new model.User
@@ -468,6 +481,26 @@ app.get('/dashboard', loadUser, function(req, res, next){
   }
 });
 
+
+//Socket_test
+app.get('/socket_test', function(req, res, next){
+  model.Order
+  .find({})
+  .exec(function(err, docs){
+    res.render('socket_test', {orders:docs})
+    })
+})
+
+
+
+io.on('connection', function(client) {
+    console.log(client + '  Client connected...');
+
+    client.on('join', function(data) {
+        console.log(data);
+        client.emit('messages', 'Hello form server')
+    });
+})
 
 //Statics
 app.get('/contacts', function(req, res, next){
