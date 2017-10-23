@@ -5,8 +5,17 @@ script(type="text/javascript" src="/javascripts/datepicker.js")
 
 script
   include ../public/javascripts/main.js
-form(method='post' action='/date')
-  input(type='text' data-toggle="datepicker" name='date')
-  button(type='submit' name="date") Submit
-  
-input(type='text' data-toggle="datepicker" name='date')
+script.
+  $(document).ready(function(){
+    $('.button').click(function(){
+      date = new Date($('input.date').val())
+      date.setMonth(date.getMonth() + 1)
+      $('.date').html(date)
+    })
+  })
+    
+form()
+  input.date(type='text' data-toggle="datepicker" name='date')
+  button.button(type='button' name="date") Submit
+
+div.date

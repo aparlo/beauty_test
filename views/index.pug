@@ -10,10 +10,11 @@ block content
           legend.uk-legend Найти мастера
           p.uk-text-media Здесь Вы можете сделать заказ на стрижку, маникюр, педикюр и другие услуги по уходу за собой
           .uk-width-1-1
-            label.uk-margin-remove-bottom Выберите услугу:
+            //- label.uk-margin-remove-bottom Выберите услугу:
             select.uk-input(type="text" placeholder="Я хочу сделать..." name="OrderName" required)
               each val, i in uslugi
-                optgroup(label=val.name value=uslugi[i].id)
+                optgroup(label=val.name value=uslugi[i].id placeholder="Выберите услугу")
+                  option Выберите услугу
                   each val, j in uslugi[i].sub_cat
                     option(value=val.id)=val.name
           label.uk-width-1-1 Выберите дату и время:

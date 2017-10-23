@@ -129,8 +129,7 @@ function loginUser(req, res, next) {
     } else{
       if (req.body.password === user.password) {
         req.session.user = user;
-        req.session.userrole = user.role;
-        console.log('Session: ' + req.session.user + ',' + req.session.userrole);
+        console.log('Session: ' + req.session.user.username + ',' + req.session.user.role);
         next();
       } else {
         res.render('login', {error: 'Wrong Password'});
@@ -140,8 +139,9 @@ function loginUser(req, res, next) {
 };
 
 function loadUser(req, res, next){
-  console.log('Verifing session...');
-  if (req.session && req.session.id){
+  console.log('Verifing session...')
+  console.log(req.session.id);
+  if (req.session && req.session.id && req.session.user){
     model.User.findOne({username: req.session.user.username}, function(err, user){
       if(!user) {
         req.session.destroy();
@@ -201,22 +201,9 @@ app.post('/uslugi_add', function(req, res, next){
 })
 
 
-//Main Page
 app.get('/', function(req, res){
-  model.User.find({}).populate({
-    path:'uslugi.name',
-    select:'name',
-    model:'Cat'
-  }).exec(function(err, docs){
-    model.User.populate(docs, {
-      path:'uslugi.sub_cat',
-      model:'Uslugi'
-    }, function(err, docs) {
-          res.render('index', {title:'Найти мастера или сделать заказ', masters: docs})
-    })
-  })
+  res.render('index', {title:'Найти мастера или сделать заказ'})
 })
-
 
 app.get('/master_card:_id', function(req, res){
   model.User.findOne({_id:req.params._id}).populate({
@@ -287,7 +274,7 @@ app.get('/login', function(req, res, next){
 
 
 app.get('/logout', function(req, res, next){
-  req.session.destroy;
+  req.session.destroy();
   res.redirect('/');
 });
 
@@ -340,12 +327,12 @@ app.post('/register_order', genPass, genNumber, function(req, res, next) {
 })
 
 
-app.post('/register', upload.single('avatar'), function(req, res, next) {
+app.post('/register', upload.single('avatar'), genPass, function(req, res, next) {
   console.log(req.body.username);
   var uslugi = Array.prototype.slice.call(req.body.uslugi)
   var User = new model.User
-  User.username = req.body.username
-  User.password = req.body.password
+  User.username = req.body.Email
+  User.password = req.password
   User.FirstName = req.body.FirstName
   User.LastName = req.body.LastName
   User.PhoneNumber = req.body.PhoneNumber
@@ -361,7 +348,7 @@ app.post('/register', upload.single('avatar'), function(req, res, next) {
     console.log('registered')
   })
   db.close
-  res.redirect('/register')
+  res.redirect('/login')
 });
 
 
@@ -435,10 +422,11 @@ app.post('/master_vote/:mastername.:orderid', function(req, res) {
     {safe: true, upsert: true},
     function(err, order_vote){
       if (err) console.log(err);
-      res.status(200).redirect('/dashboard')
+      res.redirect('/dashboard')
     }
   )
 });
+
 
 /* ClientVote. */
 app.post('/client_vote/:mastername.:orderid', function(req, res) {
@@ -455,22 +443,52 @@ app.post('/client_vote/:mastername.:orderid', function(req, res) {
 });
 
 
+function changeDate(req, res, next){
+  var date = new Date()
+  date.setMonth(date.getMonth() + 1)
+  req.newDate = date
+  next()
+}
+
+
+//merchant
+
+app.post('/payment_ok', loadUser, changeDate, function(req, res, next){
+  console.log(req.session.user.username);
+  console.log(req.newDate);
+  model.User.findById(
+    req.session.user._id, function(err, user){
+      if (err) console.log(err);
+      user.set({
+        date_expire:req.newDate,
+        merchant:{
+          status:'bronze',
+          transactions:{date:new Date, amount:'1000'}
+        }})
+      user.save(function(err, updatedDoc){
+        if (err) console.log(err)
+        console.log(updatedDoc);
+      })
+    }
+  )
+})
 
 
 app.get('/session', loadUser, function(req, res, next){
-  res.send(req.session.id + ' ' + req.session.userrole);
+  console.log(req.session.id);
+  res.send(req.session.id + ' ' + req.session.user.role);
 });
 
 app.get('/dashboard', loadUser, function(req, res, next){
   console.log('Dashboard!')
-  if (req.session.userrole == 'client') {
+  if (req.session.user.role == 'client') {
     model.Order
     .find({customer:req.session.user._id})
     .populate('name customer votes.master')
     .exec(function(err, docs){
       res.render('dashboard', {orders:docs});
       })
-  } else if (req.session.userrole == 'master'){
+  } else if (req.session.user.role == 'master'){
     console.log('User is master!');
     model.Order
     .find({})

@@ -140,19 +140,17 @@ $(document).ready(function(){
 
 $(document).ready(function(orders_new){
   $("#orders .submit").click(function(){
-    $(this).html('Value')
     $(this).closest("form")
       .submit(function(event){
         event.preventDefault()
         var action = $(this).attr('action')
-        console.log(action);
-        console.log(orders.length);
         $.ajax({
             url: $(this).attr('action'),
             type: 'POST',
             data: $(this).serialize(),
             success: function(result) {
-              alert('Вы откликнулись на заказ')
+              UIkit.modal.alert('Клиенту получил ваш отклик. Ожидайте его решения.')
+              $(document.body).html(result)
             }
         });
       })

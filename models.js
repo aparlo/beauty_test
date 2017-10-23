@@ -24,6 +24,7 @@ var uslugiSchema = new Schema({
 
 var userSchema = new Schema({
   'date_registered': {type: Date, default: Date.now},
+  'date_expire': {type: Date},
   'username': {type: String, required: true, index: {unique:true}},
   'password': {type: String},
   'FirstName': {type: String},
@@ -31,7 +32,7 @@ var userSchema = new Schema({
   'PhoneNumber': {type: String},
   'Email': String,
   'role': {type: String, required: true},
-  'status':['active', 'blocked', 'vip'],
+  'blocked':{type: Boolean, default:false},
   'about': String,
   'avatar': { data: Buffer, contentType: String },
   'uslugi': [master_uslugiSchema],
@@ -47,8 +48,13 @@ var userSchema = new Schema({
   'Reviews': [],
   'call_back_time': Number,
   'go_out': Boolean,
-  'pay_account': {
-
+  'merchant': {
+    'status':String, //free, trial, bronze, silver, gold
+    'transactions':[{
+      date:{type: Date},
+      amount:{type:Number}
+    }],
+    'date_expire': {type: Date}
   },
   'order_status': String,
   'orders_voted': [{

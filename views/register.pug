@@ -7,9 +7,9 @@ block content
     .uk-container.uk-container-small.uk-background-default.uk-padding-large
       form(method="post" action='/register' enctype="multipart/form-data")
         legend.uk-legend Зарегистрироваться
-        .uk-margin
+        //- .uk-margin
           input.uk-input.uk-input-large(type="text" placeholder="Имя пользователя" name="username" required)
-        .uk-margin
+        //- .uk-margin
           input.uk-input(type="password" placeholder="Пароль" name="password" )
         .uk-margin
           input.uk-input(type="text" placeholder="Имя" name="FirstName" )        
@@ -46,6 +46,6 @@ block content
                     each val, k in uslugi[i].sub_cat
                       li
                         label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat]" value=uslugi[i].sub_cat[k].id)] #{uslugi[i].sub_cat[k].name}
-          label #[input.uk-checkbox(type="checkbox" name="go_out" value="true")] Выезжаю к клиенту
+          label #[input.uk-checkbox(type="checkbox" name="go_out")] Выезжаю к клиенту
             textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
         button.uk-button(type="submit") Регистрация

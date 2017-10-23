@@ -1,22 +1,35 @@
 extends layout
 
 block content
-
   .uk-section-large.uk-section-muted
     .uk-container
-      .uk-grid.uk-grid-margin-medium(uk-grid)
-        each val,i in masters
-          .uk-card.uk-card-body.uk-card-default.uk-width-1-4
-            h3= val.FirstName + ' ' + val.LastName
-            hr
-            h3 Услуги мастера:
-            ul
-              each val, k in masters[i].uslugi
-                if val != null
-                  li= val.name.name
-                    ul
-                      each val, j in masters[i].uslugi[k].sub_cat
-                        if val != null
-                          li= val.name
-                        else
-                else
+      .uk-grid-small.uk-child-width-1-4.uk-grid-match(uk-grid)
+        each val, i in masters
+          div
+            .uk-card.uk-card-default.uk-card-body.uk-box-shadow-hover-large.uk-box-shadow-small(onclick="show_master('master_card" + val.id + "')")
+              h4= val.FirstName + ' ' + val.LastName
+              hr
+              ul.uk-list(uk-accordion="multiple: true")
+                each val, k in masters[i].uslugi
+                  if val != null
+                    li= val.name.name
+                      //- .uk-accordion-content
+                      //-   ul
+                      //-     each val, j in masters[i].uslugi[k].sub_cat
+                      //-       if val != null
+                      //-         li= val.name
+                      //-       else
+                  else
+            div(id="master_card" + val.id uk-modal)
+              .uk-modal-dialog.uk-modal-body
+                h2 #{val.FirstName} #{val.LastName}
+                h3.uk-margin-remove-bottom О мастере:
+                .uk-grid
+                  .uk-width-1-2
+                    h4.uk-margin-remove Услуги мастера:
+                    div.uk-margin-remove-top#master_card_data
+                      ul.uk-margin-remove-top.uk-list
+                  .uk-width-1-2
+                    p.uk-text.meta Телефон:
+                    h3.uk-margin-remove #{val.PhoneNumber}
+                button.uk-button.uk-button-primary Написать мастеру
