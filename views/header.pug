@@ -1,6 +1,6 @@
-nav(class="uk-navbar-container" uk-navbar)
+nav.uk-box-shadow-small(class="uk-navbar-container" uk-navbar)
   .uk-navbar-left
-    a(class="uk-navbar-item uk-logo" href="/") #[img(src="../images/logo_long.svg" style="height: 20%")]
+    a(class="uk-navbar-item uk-logo" href="/") #[img(src="../images/logo_long.svg" style="height: 50%")]
   if !Ses
     .uk-navbar-center
       ul.uk-navbar-nav.uk-nav-defaut(uk-nav)
@@ -17,43 +17,53 @@ nav(class="uk-navbar-container" uk-navbar)
   else
     case Ses.user.role
       when 'master'
-        .uk-navbar-center
-          ul.uk-navbar-nav(uk-switcher="connect: .switch")
-            li
-              a Заказы  #[span.uk-badge.uk-margin-small-left #{orders.length}]
-            li
-              a Редактирование профиля
-            li
-              a Сменить пароль
-            li
-              a Портфолио
-            li
-              a Мой Счет
-            li
-              a Сообщения
         .uk-navbar-right
           .uk-margin-right
             span.uk-margin-small-right(uk-icon="icon: sign-in")
             a.uk-button.uk-button-text(href="/logout") Выход
       when 'client'
         .uk-navbar-center
-          ul.uk-navbar-nav(uk-switcher="connect: .switch"  class='uk-visible@m')
-            li
-              a Заказы
-            li
-              a Новый заказ
-            li
-              a Редактирование профиля
-            li
-              a Сбросить пароль
-            li
-              a Сообщения
+
           a.uk-navbar-toggle(uk-navbar-toggle-icon class="uk-hidden@m" uk-toggle="target: #mobilemenu" href="")
         .uk-navbar-right
           a.uk-button.uk-button-secondary.uk-margin-right(class='uk-visible@l' href="/register") Стать мастером
           .uk-margin-right
             span.uk-margin-small-right(uk-icon="icon: sign-in")
             a.uk-button.uk-button-text(href="/logout") Выход
+if Ses
+  case Ses.user.role
+    when 'master'
+      nav.uk-navbar-container
+          .uk-navbar-center.uk-flex-center
+            ul.uk-navbar-nav(uk-switcher="connect: .switch")
+              li
+                a Заказы  
+                  if orders
+                    span.uk-badge.uk-margin-small-left #{orders.length}
+              li
+                a Редактирование профиля
+              li
+                a Сменить пароль
+              li
+                a Портфолио
+              li
+                a Мой Счет
+              li
+                a Сообщения
+    when 'client'
+      nav.uk-navbar-container
+          .uk-navbar-center.uk-flex-center
+            ul.uk-navbar-nav(uk-switcher="connect: .switch"  class='uk-visible@m')
+              li
+                a Заказы
+              li
+                a Новый заказ
+              li
+                a Редактирование профиля
+              li
+                a Сбросить пароль
+              li
+                a Сообщения
 #mobilemenu(hidden)
   nav.uk-navbar-container(uk-navbar="dropbar: true; dropbar-mode: push")
     ul.uk-navbar-nav.uk-nav-primary.uk-nav-center(class="uk-visible@s" uk-switcher="connect: .switch")

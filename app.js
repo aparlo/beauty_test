@@ -15,13 +15,37 @@ var model = require('./models.js')
 var url = 'mongodb://localhost:27017/testing-new'
 var db = mongoose.connect(url)
 var app = express()
+var fs = require('fs')
 const multer = require('multer')
-var storage = multer.memoryStorage()
-var upload = multer({storage: storage})
+
 var nodemailer = require('nodemailer')
 var io = socket_io()
 app.io = io
 
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    var path = './public/images/uploads/' + req.session.user.username
+    fs.stat(path, function(err, stat){
+      if (err) {
+        console.log('Folder is not exist')
+        fs.mkdir(path)
+      }
+      else if (!stat.isDirectory()){
+        console.log('Is not a folder')
+      }
+      else{
+        console.log('Folder exist')
+      }
+    })
+    cb(null, path)
+  },
+  filename: function (req, file, cb) {
+    cb(null, req.session.user.username + file.originalname)
+  }
+})
+
+var upload_dir = multer({storage: storage})
+var cpUpload = upload_dir.fields([{name:'images', maxCount:3}])
 
 
 //test sms_token
@@ -48,7 +72,7 @@ function Send_sms_reg(phone, msg) {
 
 // setup email data with unicode symbols
 let mailOptions = {
-    from: '"Fred Foo 👻" <aparlo@yandex.ru>', // sender address
+    from: '"Fred Foo 👻" <info@thetopmasters.ru>', // sender address
     to: 'aparlo@icloud.com, parlobox@gmail.com', // list of receivers
     subject: 'Hello ✔', // Subject line
     text: 'Hello world ?', // plain text body
@@ -164,6 +188,24 @@ app.use('/', function(req, res, next){
     res.locals.uslugi = uslugi
     next()
   })
+})
+
+app.get('/upload', loadUser, function(req, res){
+  res.render('upload')
+})
+
+function AddPortfolio(req, res, next){
+  var img_path = req.files.images[0].path.replace('public', '')
+  console.log(img_path)
+  model.User.update({_id:req.session.user._id}, 
+    {$addToSet: {portfolio: img_path}},
+    {safe: true, upsert: true}).exec()
+  next()
+}
+
+app.post('/file_upload', cpUpload, AddPortfolio, function(req, res, next){
+  res.send('OK').status(200)
+  res.end()
 })
 
 app.get('/send_sms', function(req, res) {
@@ -294,7 +336,6 @@ app.post('/date', function(req, res, next){
   console.log(req.body)
 })
 
-
 app.post('/register_order', genPass, genNumber, function(req, res, next) {
   var User = new model.User
   User._id = new mongoose.Types.ObjectId()
@@ -327,7 +368,7 @@ app.post('/register_order', genPass, genNumber, function(req, res, next) {
 })
 
 
-app.post('/register', upload.single('avatar'), genPass, function(req, res, next) {
+app.post('/register', cpUpload, genPass, function(req, res, next) {
   console.log(req.body.username);
   var uslugi = Array.prototype.slice.call(req.body.uslugi)
   var User = new model.User
@@ -452,7 +493,6 @@ function changeDate(req, res, next){
 
 
 //merchant
-
 app.post('/payment_ok', loadUser, changeDate, function(req, res, next){
   console.log(req.session.user.username);
   console.log(req.newDate);
@@ -499,25 +539,35 @@ app.get('/dashboard', loadUser, function(req, res, next){
   }
 });
 
-
-//Socket_test
 app.get('/socket_test', function(req, res, next){
-  model.Order
-  .find({})
-  .exec(function(err, docs){
-    res.render('socket_test', {orders:docs})
-    })
+ res.render('socket_test')
+
 })
 
+var getResult = function(num){
+  result = num + 2
+  console.log('Get result: ' + result)
+}
 
+io.on('connection', function(socket) {
+    console.log(socket + '  Client connected...');
 
-io.on('connection', function(client) {
-    console.log(client + '  Client connected...');
+    socket.on('join', function(data) {
+    })
+    
+    socket.on('get_result', function(data){
+      getResult(data)
+    })
 
-    client.on('join', function(data) {
-        console.log(data);
-        client.emit('messages', 'Hello form server')
-    });
+    socket.on('querry', function(data){
+      console.log(data)
+      model.User
+      .find({username:{$regex: ".*" + data+ ".*"}})
+      .exec(function(err, user){
+        console.log(user)
+        socket.emit('result', user)
+      })
+    })
 })
 
 //Statics

@@ -3,7 +3,7 @@ extends layout
 block content
   script
     include ../public/javascripts/register.js
-  .uk-section.uk-section-muted
+  .uk-section.uk-section-muted.uk-padding-remove-bottom
     .uk-width-1-3.uk-position-relative.uk-position-z-index.uk-float-right.uk-margin-large-right
       .uk-card.uk-card-default.uk-card-body
         form#form.uk-grid.uk-grid-small(method="post" action='/register_order' uk-grid)
@@ -70,9 +70,13 @@ block content
           .uk-width-1
             button.uk-button(type="submit") Дальше
     .uk-panel
-      ul#slides
-        h3.uk-heading-primary.uk-text-left.uk-padding.uk-padding-remove-top Вся индустрия красоты <br><b>здесь и сейчас
-      .uk-section.uk-height-large.uk-section-large.uk-section-cover(style="height:600px; background-position: right top; background-image: url(/images/industry.jpg)")
+      #sliders.uk-switcher
+        #imgback
+          h3.uk-heading-primary.uk-text-left.uk-padding.uk-padding-remove-top Вся индустрия красоты <br><b>здесь и сейчас
+          .uk-section.uk-height-large.uk-section-large.uk-section-cover(style="height:600px; background-position: right top; background-image: url(/images/industry.jpg)")
+        #imgback
+          h3.uk-heading-primary.uk-text-left.uk-padding.uk-padding-remove-top Второй красивый <br><b>слоган
+          .uk-section.uk-height-large.uk-section-large.uk-section-cover(style="height:600px; background-position: right top; background-image: url(/images/desk1.jpg)")
       
   .uk-section-large
     .uk-container

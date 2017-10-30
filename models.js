@@ -17,8 +17,17 @@ var master_uslugiSchema = new Schema({
   'sub_cat': [{type: Schema.Types.ObjectId, ref:'Cat'}]
 })
 
+var cartSchema = new Schema({
+  'payment_id': String,
+  'user': {type: Schema.Types.ObjectId, ref:'User' },
+  'date': Date,
+  'amount': Number
+})
+
 var uslugiSchema = new Schema({
   'name': String,
+  'time_lapse': {type: Date},
+  'price': {type: Number},
   'cat': {type: Schema.Types.ObjectId, ref:'Cat'}
 })
 
@@ -76,7 +85,12 @@ var orderSchema = new Schema({
   'votes': [{
     master: {type: Schema.Types.ObjectId, ref:'User'},
     price: Number,
-    time: String}], //сюда помещается предложения исполнителей как объекты.
+    time: String,
+    comments: [{
+      user:{type: Schema.Types.ObjectId, ref: 'User'},
+      message:{type:String}
+    }]
+}], //сюда помещается предложения исполнителей как объекты.
   'status': {type:String, default:'new'},
   'master': {type: Schema.Types.ObjectId, ref:'User'},
   'place': String
@@ -93,3 +107,4 @@ module.exports.Order = mongoose.model('Order', orderSchema)
 module.exports.Uslugi = mongoose.model('Uslugi', uslugiSchema, 'uslugi')
 module.exports.MasterUslugi = mongoose.model('MasterUslugi', master_uslugiSchema)
 module.exports.Cat = mongoose.model('Cat', catSchema, 'categories')
+module.exports.Cart = mongoose.model('Cart', cartSchema)

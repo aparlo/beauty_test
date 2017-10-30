@@ -190,15 +190,22 @@ var i=0
 
 function nextTab() {
     // here comes the function to click the next tab
-    imgs = ['url(/images/industry.jpg)', 'url(/images/desk1.jpg)']
-    UIkit.switcher('#switch1').show(i);
-    console.log('nexttab'+i);
-    if (i == (imgs.length - 1)){
-      i=0
-    } else{
-      i++
-    }
-    // and here you call this function again
-    setTimeout(nextTab, 10000);
+  imgs = $('#sliders > #imgback').length
+  console.log(imgs)
+  // imgs = ['url(/images/industry.jpg)', 'url(/images/desk1.jpg)']
+  UIkit.switcher('#sliders').show(i);
+  console.log('nexttab'+i);
+  if (i == (imgs - 1)){
+    i=0
+  } else{
+    i++
+  }
+  // and here you call this function again
+  setTimeout(nextTab, 10000);
 }
-setTimeout(nextTab, 0);
+$(document).ready(function(){
+  setTimeout(nextTab, 0);
+})
+
+
+//Sockets
