@@ -181,12 +181,12 @@
                     }
 
                 });
-            .uk-container-default
-              .uk-child-width-1-3(uk-grid uk-lightbox="animation: slide")
+            .uk-container-default.uk-padding
+              .uk-child-width-1-3(uk-grid uk-lightbox="animation: fade")
                 each val, i in Ses.user.portfolio
                   div
-                    a.uk-inline(href=val)
-                      img(src=val width="400px")
+                    a.uk-inline(href=val caption="")
+                      img(src=val style="border-width:10px; border-color:lime; width:400px; height:300px; object-fit: cover")
         //- li  
           #oplata.uk-container-small.uk-background-muted.uk-padding-large
             .uk-container-small.uk-padding-large.uk-background-muted
