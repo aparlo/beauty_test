@@ -26,10 +26,12 @@
                         p Голосов: #{orders[i].votes.length}
                       else
                         p Вы будете первым кто откликнется
-                      each val in orders[i].votes
+                      each val, o in orders[i].votes
                         - voted.push(val.master.toString());
                       - var idx = voted.indexOf(Ses.user.id.toString())
                       if idx != -1
+                        script.
+                          var idxs = #{idx}
                         p Вы уже откликнулись на этот заказ
                       else
                         form(id="order_vote" method='POST' action="/master_vote/" + Ses.user.id + '.' + orders[i].id)
@@ -37,16 +39,24 @@
                             input.uk-input.uk-form-width-small(type="number" placeholder="Цена" name="price")
                           .uk-margin
                             button.submit.uk-margin-right.uk-button.uk-button-primary(type='submit') хочу этот заказ
-                      <ul uk-accordion>
-                        <li>
-                          <h3 class="uk-accordion-title">Чат</h3>
-                          <div class="uk-accordion-content">
-                            #messages
-                            textarea.uk-textarea(rows=2)
-                            button.uk-button Отправить
-                          </div>
-                        </li>
-                      </ul>
+                      if idx != -1
+                        //- p= orders[i].votes[idx]._id
+                        //- p= idx
+                        <ul uk-accordion>
+                          <li>
+                            <h3 class="uk-accordion-title">Чат</h3>
+                            <div class="uk-accordion-content">
+                              div(id="messages" + orders[i].votes[idx].id)
+                                each val, c in orders[i].votes[idx].comments
+                                  p.uk-margin-remove-bottom <b> #{val.user.FirstName} </b>
+                                  p.uk-margin-remove-top= val.message
+                              textarea#user_message.uk-textarea(rows=2)
+                              button(onclick="SendMessage('" + Ses.user._id + "', '" + orders[i].customer._id + "', '" + orders[i].votes[idx].id + "', this)").uk-button Отправить
+                            </div>
+                          </li>
+                        </ul>
+                      else
+
 
         li
           .uk-panel.uk-padding-large.uk-background-muted
@@ -177,13 +187,13 @@
                   div
                     a.uk-inline(href=val)
                       img(src=val width="400px")
-        li  
+        //- li  
           #oplata.uk-container-small.uk-background-muted.uk-padding-large
             .uk-container-small.uk-padding-large.uk-background-muted
               h2.uk-heading-divider Оплата
                 <style>.tinkoffPayRow{display:block;margin:1%;width:160px;}</style>
                 <script src="https://securepay.tinkoff.ru/html/payForm/js/tinkoff.js"></script>
-                <form name="TinkoffPayForm" onsubmit="pay(this); return false;">
+                <form id="oplata_form" name="TinkoffPayForm") >
                   <input class="tinkoffPayRow" type="hidden" name="terminalkey" value="1507039678027DEMO">
                   <input class="tinkoffPayRow" type="hidden" name="frame" value="true">
                   <input class="tinkoffPayRow" type="hidden" name="language" value="ru">
@@ -197,6 +207,25 @@
                   input.tinkoffPayRow(type="hidden" placeholder="Контактный телефон" name="phone" value=Ses.user.PhoneNumber)
                   input.tinkoffPayRow.uk-button.uk-button-primary(type="submit" value="Оплатить")
                 </form>
+script.
+  function SendMessage(from, to, voteid, object){
+    user_message = $(object).siblings('textarea').val()
+    console.log('Message sent: '+ user_message)
+    socket.emit('send_message', {to:to, from: from, sender: 'Мастер', voteid:voteid, message:user_message})
+    $(object).siblings('textarea').val('')
+  }
+
+  socket.on('new_message', (data) => {
+    jQuery.each(data.doc, (d, val) => {
+      $('#messages' + data.doc[d]._id).empty()
+      jQuery.each(data.doc[d].comments, (i, val) => {
+        $('#messages' + data.doc[d]._id).append('<p class="uk-margin-remove-bottom"><b>' + val.user.FirstName + ':</b></p>')
+        $('#messages' + data.doc[d]._id).append('<p class="uk-margin-remove-top">' + val.message + '</p>')
+      })
+    })
+  })
+
+
   //- .uk-panel(style="width:100% !important")
   //-   .uk-section.uk-section-cover(style="width:100% !important; height:100%; background-attachment: fixed; background-position: right center; background-image: url(/images/desk1.jpg)")
   //-   .uk-overlay.uk-overlay-primary.uk-position-cover

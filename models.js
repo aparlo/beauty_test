@@ -18,7 +18,6 @@ var master_uslugiSchema = new Schema({
 })
 
 var cartSchema = new Schema({
-  'payment_id': String,
   'user': {type: Schema.Types.ObjectId, ref:'User' },
   'date': Date,
   'amount': Number

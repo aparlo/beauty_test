@@ -1,3 +1,5 @@
+var socket = io.connect();
+
 $(function () {
 
   'use strict';
@@ -144,19 +146,25 @@ $(document).ready(function(orders_new){
       .submit(function(event){
         event.preventDefault()
         var action = $(this).attr('action')
+        // result = action.replace(/(.+\/.+\.)(.+)/g, '$2')
+        // console.log(result)
+        // socket.emit('new_master_vote', result)
         $.ajax({
-            url: $(this).attr('action'),
-            type: 'POST',
-            data: $(this).serialize(),
-            success: function(result) {
-              UIkit.modal.alert('Клиенту получил ваш отклик. Ожидайте его решения.')
-              $(document.body).html(result)
+              url: $(this).attr('action'),
+              type: 'POST',
+              data: $(this).serialize(),
+              success: function(result) {
+                UIkit.modal.alert('Клиент получил ваш отклик. Ожидайте его решения.')
+                $(document.body).html(result)
             }
         });
       })
   })
-
 });
+
+socket.on('new_master_vote', (data)=>{
+  console.log(data)
+})
 
 function show_master(id) {
   console.log(id);
@@ -185,6 +193,18 @@ function show_master(id) {
   })
 }
 
+//Client vote
+function ClientVote(order, master, object){
+  $.ajax({
+    url: '/client_vote/' + master + '.' + order,
+    type: 'POST',
+    success: (result) => {
+      UIkit.modal.alert('Спасибо! Мастер свяжется с вами в ближайшее время.')
+      $(document.body).html(result)
+    }
+})
+}
+
 var i=0
 
 
@@ -207,5 +227,97 @@ $(document).ready(function(){
   setTimeout(nextTab, 0);
 })
 
+// $(document).ready(function(){
+//   $('#oplata').find('form').submit(function(e){
+//     console.log('Found form')
+//     e.preventDefault
+//   })
+  
+// })
 
 //Sockets
+socket.on('connect', function(data) {
+  socket.emit('join', 'HeyHey');
+})
+//- socket.on('messages', function(data){
+//-   alert(data)
+//- })
+
+$(document).ready(function(){
+  $("#inp").keyup(function(e){
+    var text = $(this).val()
+    console.log()
+    $("#send").submit()
+  })
+})
+
+
+$(document).ready(function(){
+  $('#send').submit(function(e){
+    e.preventDefault()
+    var data = $(this).find("input").val()
+    socket.emit('querry', data)
+  })
+})
+
+$(document).ready(function(){
+  $(".get_result").click(function(e){
+    console.log('Rusult clicked')
+    socket.emit('get_result', 1)
+  })
+
+})
+
+socket.on('result', function(data){
+  $("#result").empty()
+  if(data)
+    $("#result").append("<ul>")
+    jQuery.each(data, function(i, val){
+      $("#result").append("<li>" + val.username + "</li>")
+    })
+   
+})
+
+$(document).ready(function(){
+  var myform = $('#oplata_form')
+  myform.submit(function(e){
+    var form_data = this
+    console.log('Found form')
+    e.preventDefault()
+    socket.emit('register_cart')
+    socket.on('cart_registered', function(data){
+      form_data.order.value = data._id
+      pay(form_data); return false
+    })
+  })
+})
+
+// function SendMessage(from, to, voteid, object){
+//   user_message = $(object).siblings('textarea').val()
+//   console.log('Sent message: '+ user_message)
+//   socket.emit('send_message', {to:to, from: from, voteid:voteid, message:user_message})
+//   $(object).siblings('textarea').val('')
+//   $(object).siblings('#master_messages' + to).append('<b>Вы: </b>' + user_message + '<br />')
+//   $(object).siblings('#client_messages' + to).append('<b>Вы: </b>' + user_message + '<br />')
+// }
+
+// socket.on('new_message', function(data){
+//   console.log(data)
+//   $('#master_messages' + data.from).append('Клиент: ' + data.message + '<br />')
+//   $('#client_messages' + data.from).append('Мастер: ' + data.message + '<br />')
+// })
+
+// function getMessages(data){
+//   console.log(data)
+//   socket.emit('get_messages', data)
+// }
+
+// socket.on('get_messages_result', (data) =>{
+//   console.log(data.votes[1].comments)
+//   $('#master_messages'+data._id).html('Клиент: ' + data.votes[1].comments + '<br />')
+// })
+
+// socket.on('update', function(data){
+//   console.log(data)
+//   getMessages()
+// })

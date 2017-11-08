@@ -27,44 +27,87 @@
                           h4.uk-margin-small у клиента
                       .uk-width-1-2.uk-margin-top   
                         h4.uk-margin-small.uk-text-meta Район:
-                        h4.uk-margin-small #{orders[i].address.district} 
-                .uk-tile.uk-width-1-2.uk-margin-large-bottom
-                  .uk-container.uk-container-large
-                    h4 Предложения по вашему заказу:
-                    p.uk-text-small Ваш заказ отправлен мастерам, дождитесь их предложений.
-                    ul
-                      .uk-child-width-1-1(uk-grid)
-                        each val, o in orders[i].votes
-                          div
-                            .uk-card.uk-card-default
-                              .uk-card-header.uk-dark
-                                .uk-grid-small.uk-flex-middle(uk-grid)
+                        h4.uk-margin-small #{orders[i].address.district}
+                if orders[i].status == 'new'
+                  .uk-tile.uk-width-1-2.uk-padding-remove-top
+                    .uk-container.uk-container-large
+                      h4 Предложения по вашему заказу:
+                      p.uk-text-small Ваш заказ отправлен мастерам, дождитесь их предложений.
+                      ul
+                        .uk-child-width-1-1(uk-grid)
+                          each val, o in orders[i].votes
+                            div
+                              .uk-card.uk-card-default
+                                .uk-card-header.uk-dark
+                                  .uk-grid-small.uk-flex-middle(uk-grid)
+                                    .uk-width-1-2
+                                      a.uk-button-text(onclick="show_master('master_card" + val.master.id + "')") #{val.master.FirstName} #{val.master.LastName}
+                                    .uk-width-1-2
+                                      p.uk-float-right Цена: #{val.price} 
+                                .uk-card-body
+                                  .uk-baidge(id="messages" + orders[i].votes[o]._id)
+                                    each val, c in orders[i].votes[o].comments
+                                      p.uk-margin-remove-bottom <b> #{val.user.FirstName} </b>
+                                      p.uk-margin-remove-top= val.message
+                                  .uk-inline
+                                    textarea#user_message.uk-textarea.uk-form-width-large(type="textarea")
+                                    button.uk-button.uk-button-primary( onclick="SendMessage('" + Ses.user._id + "', '" + orders[i].votes[o].master._id + "', '" + orders[i].votes[o]._id + "', this)" uk-icon="icon: comment") Отправить
+                                    button.uk-button.uk-button-default( onclick="ClientVote('" + orders[i]._id + "', '" + orders[i].votes[o].master._id + "', this)" uk-icon="icon: user") Выбрать мастера
+                            div(id="master_card" + val.master.id uk-modal)
+                              .uk-modal-dialog.uk-modal-body
+                                h2 #{val.master.FirstName} #{val.master.LastName}
+                                p Мастер готов выполнить ваш заказ за #{val.price} руб.
+                                h3.uk-margin-remove-bottom О мастере:
+                                .uk-grid
                                   .uk-width-1-2
-                                    a.uk-button-text(onclick="show_master('master_card" + val.master.id + "')") #{val.master.FirstName} #{val.master.LastName}
+                                    h4.uk-margin-remove Услуги мастера:
+                                    div.uk-margin-remove-top#master_card_data
+                                      ul.uk-margin-remove-top.uk-list
                                   .uk-width-1-2
-                                    p.uk-float-right Цена: #{val.price} 
-                              .uk-card-body
-                                .uk-baidge
-                                  p.uk-text-small.uk-margin-remove-bottom.uk-text-bold Мастер:
-                                  p.uk-margin-remove-top Здравствуйте! Заинтересовал ваш заказ!
-                                .uk-inline
-                                  textarea.uk-textarea.uk-form-width-large(type="textarea")
-                                  a.uk-button.uk-button-primary(uk-icon="icon: user") Отправить
-                              //- a.uk-link(onclick="show_master('master_card" + val.master.id + "')") #{val.master.FirstName} #{val.master.LastName}, #{val.price} руб.
-                          div(id="master_card" + val.master.id uk-modal)
-                            .uk-modal-dialog.uk-modal-body
-                              h2 #{val.master.FirstName} #{val.master.LastName}
-                              p Мастер готов выполнить ваш заказ за #{val.price} руб.
-                              h3.uk-margin-remove-bottom О мастере:
-                              .uk-grid
-                                .uk-width-1-2
-                                  h4.uk-margin-remove Услуги мастера:
-                                  div.uk-margin-remove-top#master_card_data
-                                    ul.uk-margin-remove-top.uk-list
-                                .uk-width-1-2
-                                  p.uk-text.meta Телефон:
-                                  h3.uk-margin-remove #{val.master.PhoneNumber}
-                              button.uk-button Выбрать мастера
+                                    p.uk-text.meta Телефон:
+                                    h3.uk-margin-remove #{val.master.PhoneNumber}
+                                button.uk-button Выбрать мастера
+                else
+                  .uk-tile.uk-width-1-2.uk-padding-remove-top
+                    .uk-container.uk-container-large
+                      h3 Ваш заказ выполняется:
+                      p.uk-text-small Вы также можете написать мастеру в чате.
+                      ul
+                        .uk-child-width-1-1(uk-grid)
+                          each val, o in orders[i].votes
+                            if orders[i].votes[o].master._id = orders[i].master
+                              div
+                                .uk-card.uk-card-default
+                                  .uk-card-header.uk-dark
+                                    .uk-grid-small.uk-flex-middle(uk-grid)
+                                      .uk-width-1-2
+                                        a.uk-button-text(onclick="show_master('master_card" + val.master.id + "')") #{val.master.FirstName} #{val.master.LastName}
+                                      .uk-width-1-2
+                                        p.uk-float-right Цена: #{val.price} 
+                                  .uk-card-body
+                                    .uk-baidge(id="messages" + orders[i].votes[o]._id)
+                                      each val, c in orders[i].votes[o].comments
+                                        p.uk-margin-remove-bottom <b> #{val.user.FirstName} </b>
+                                        p.uk-margin-remove-top= val.message
+                                    .uk-inline
+                                      textarea#user_message.uk-textarea.uk-form-width-large(type="textarea")
+                                      button.uk-button.uk-button-primary( onclick="SendMessage('" + Ses.user._id + "', '" + orders[i].votes[o].master._id + "', '" + orders[i].votes[o]._id + "', this)" uk-icon="icon: check") Заказ завершен
+                                      button.uk-button.uk-button-danger( onclick="ClientVote('" + orders[i]._id + "', '" + orders[i].votes[o].master._id + "', this)" uk-icon="icon: warning") Что-то пошло не так
+                              div(id="master_card" + val.master.id uk-modal)
+                              .uk-modal-dialog.uk-modal-body
+                                h2 #{val.master.FirstName} #{val.master.LastName}
+                                p Мастер готов выполнить ваш заказ за #{val.price} руб.
+                                h3.uk-margin-remove-bottom О мастере:
+                                .uk-grid
+                                  .uk-width-1-2
+                                    h4.uk-margin-remove Услуги мастера:
+                                    div.uk-margin-remove-top#master_card_data
+                                      ul.uk-margin-remove-top.uk-list
+                                  .uk-width-1-2
+                                    p.uk-text.meta Телефон:
+                                    h3.uk-margin-remove #{val.master.PhoneNumber}
+                                button.uk-button Выбрать мастера
+                            else
       li
         if Ses.user.order_status == 'inactive'
           .uk-card.uk-card-default.uk-card-body
@@ -149,6 +192,26 @@
                 option Эртиль    
                 textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
             button.uk-button(type="submit") Изменить
+script.
+  function SendMessage(from, to, voteid, object){
+    user_message = $(object).siblings('textarea').val()
+    console.log('Message sent: '+ user_message)
+    socket.emit('send_message', {to:to, from: from, sender: 'Мастер', voteid:voteid, message:user_message})
+    $(object).siblings('textarea').val('')
+  }
+
+  socket.on('new_message', (data) => {
+    console.log(data)
+    //- jQuery.each(data.doc.votes)
+    //-   console.log()
+    jQuery.each(data.doc, (d, val) => {
+      $('#messages' + data.doc[d]._id).empty()
+      jQuery.each(data.doc[d].comments, (i, val) => {
+        $('#messages' + data.doc[d]._id).append('<p class="uk-margin-remove-bottom"><b>' + val.user.FirstName + ':</b></p>')
+        $('#messages' + data.doc[d]._id).append('<p class="uk-margin-remove-top">' + val.message + '</p>')
+      })
+    })
+  })
 //- .uk-panel(style="width:100% !important")
   //- #sliders.uk-switcher
     #imgback.uk-section.uk-section-cover.uk-animation-fade(style="width:100% !important; height:100%; background-attachment: fixed; background-position: right center; background-image: url(/images/desk1.jpg)")

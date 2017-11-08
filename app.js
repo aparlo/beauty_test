@@ -1,4 +1,5 @@
 var express = require('express')
+var bcrypt = require('bcrypt')
 var socket_io    = require("socket.io")
 var request = require('request');
 var https = require('https');
@@ -17,6 +18,11 @@ var db = mongoose.connect(url)
 var app = express()
 var fs = require('fs')
 const multer = require('multer')
+
+//bcrypt conf
+const saltRounds = 10;
+// const myPlaintextPassword = 's0/\/\P4$$w0rD';
+// const someOtherPlaintextPassword = 'not_bacon';
 
 var nodemailer = require('nodemailer')
 var io = socket_io()
@@ -51,14 +57,13 @@ var cpUpload = upload_dir.fields([{name:'images', maxCount:3}])
 //test sms_token
 var sms_token = 'a7042f981e8f5c3c9b9120c9a1c3b19f017892e97393aff66e27035c503af2643271b5dc2f43a4f83017266587d6916a004a4b82a39b9764209ef563558207d7'
 
-function Send_sms_reg(phone, msg) {
-  var uri = 'https://api.smsworldhub.com/v1/send?'+'token='+sms_token+'&phone='+phone+'&mes=Для продолжения регистрации на сайте thetopmasters.ru, введите код: 1124'
+function Send_sms(phone, msg) {
   var options = { method: 'GET',
     url: 'https://api.smsworldhub.com/v1/send',
     qs:
      { token: 'a7042f981e8f5c3c9b9120c9a1c3b19f017892e97393aff66e27035c503af2643271b5dc2f43a4f83017266587d6916a004a4b82a39b9764209ef563558207d7',
        phone: phone,
-       mes: 'Для продолжения регистрации на сайте thetopmasters.ru, введите код:'+msg },
+       mes: msg},
     headers:
      { 'postman-token': '7b8fa2d5-22f4-9d8e-33cb-e8f337e2b0b1',
        'cache-control': 'no-cache' } };
@@ -71,13 +76,13 @@ function Send_sms_reg(phone, msg) {
 
 
 // setup email data with unicode symbols
-let mailOptions = {
-    from: '"Fred Foo 👻" <info@thetopmasters.ru>', // sender address
-    to: 'aparlo@icloud.com, parlobox@gmail.com', // list of receivers
-    subject: 'Hello ✔', // Subject line
-    text: 'Hello world ?', // plain text body
-    html: '<b>Hello world ?</b>' // html body
-}
+// let mailOptions = {
+//     from: '"TheTopmasters" <info@thetopmasters.ru>', // sender address
+//     to: 'aparlo@icloud.com, parlobox@gmail.com', // list of receivers
+//     subject: 'Hello ✔', // Subject line
+//     text: 'Hello world ?', // plain text body
+//     html: '<b>Hello world ?</b>' // html body
+// }
 
 // create reusable transporter object using the default SMTP transport
 let transporter = nodemailer.createTransport({
@@ -102,19 +107,26 @@ let transporter = nodemailer.createTransport({
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+//Session config
+var sessionMiddleware = session({
+  store: new MongoStore({url:url}),
+  secret: 'keyboard cat',
+  cookie: { maxAge: 60000000 }
+  })
+
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(session({
-  store: new MongoStore({url:url}),
-  secret: 'keyboard cat',
-  cookie: { maxAge: 60000000 }
-  }));
+app.use(sessionMiddleware);
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+io.use(function(socket, next) {
+  sessionMiddleware(socket.request, socket.request.res, next);
+})
 
 function genPass(req, res, next) {
   var chars = "abcdefghijklmnopqrstuvwxyz1234567890";
@@ -123,8 +135,8 @@ function genPass(req, res, next) {
       var i = Math.floor(Math.random() * chars.length);
       pass += chars.charAt(i);
   }
-  req.password = '111';
-  console.log(pass);
+  req.password = pass;
+  console.log('User password: ' + pass);
   Send_sms_reg(req.body.PhoneNumber, req.password)
   next()
 }
@@ -190,10 +202,7 @@ app.use('/', function(req, res, next){
   })
 })
 
-app.get('/upload', loadUser, function(req, res){
-  res.render('upload')
-})
-
+//Upload
 function AddPortfolio(req, res, next){
   var img_path = req.files.images[0].path.replace('public', '')
   console.log(img_path)
@@ -213,6 +222,7 @@ app.get('/send_sms', function(req, res) {
   res.send('send_sms')
 })
 
+
 //Uslugi Show, Edit, Add
 app.get('/uslugi', function(req, res, next){
   res.render('uslugi')
@@ -229,7 +239,6 @@ app.post('/uslugi_newcat', function(req, res, next){
 })
 
 app.post('/uslugi_add', function(req, res, next){
-  console.log(req.body);
   Usluga = new model.Uslugi
   Usluga._id = new mongoose.Types.ObjectId()
   Usluga.name = req.body.name
@@ -243,10 +252,13 @@ app.post('/uslugi_add', function(req, res, next){
 })
 
 
+//Index
 app.get('/', function(req, res){
   res.render('index', {title:'Найти мастера или сделать заказ'})
 })
 
+
+//Master cards
 app.get('/master_card:_id', function(req, res){
   model.User.findOne({_id:req.params._id}).populate({
     path:'uslugi.name',
@@ -262,6 +274,7 @@ app.get('/master_card:_id', function(req, res){
     })
   })
 })
+
 
 
 //Filter
@@ -321,20 +334,12 @@ app.get('/logout', function(req, res, next){
 });
 
 
+
 //Register
 app.get('/register', function(req, res, next){
   res.render('register')
 })
 
-
-app.get('/date',  function(req, res, next){
-  res.render('date')
-})
-
-
-app.post('/date', function(req, res, next){
-  console.log(req.body)
-})
 
 app.post('/register_order', genPass, genNumber, function(req, res, next) {
   var User = new model.User
@@ -346,7 +351,7 @@ app.post('/register_order', genPass, genNumber, function(req, res, next) {
   User.PhoneNumber = req.body.PhoneNumber
   User.Email = req.body.Email
   User.role = 'client'
-  User.status = 'blocked'
+  User.status = 'active'
   User.order_status = 'active'
   User.save(function(err, client){
     if (err) console.log(err)
@@ -367,7 +372,7 @@ app.post('/register_order', genPass, genNumber, function(req, res, next) {
   })
 })
 
-
+//Register
 app.post('/register', cpUpload, genPass, function(req, res, next) {
   console.log(req.body.username);
   var uslugi = Array.prototype.slice.call(req.body.uslugi)
@@ -438,7 +443,7 @@ app.get('/users', function(req, res, next){
 
 
 //Orders
-app.post('/new_order', genNumber, loadUser, function(req, res) {
+app.post('/new_order', genNumber, function(req, res) {
   var Order = new model.Order
   Order.name = req.body.OrderName
   Order.number = req.number
@@ -451,9 +456,38 @@ app.post('/new_order', genNumber, loadUser, function(req, res) {
   Order.status = 'new'
   Order.save(function(err, order){
     if (err) console.log(err)
+    model.User.find()
+    .where('role').equals('master')
+    .where('status').equals('active')
+    .where('merchant.status').nin(['free'])
+    .where('name').equals(order.name)
+    .select('PhoneNumber -_id')
+    .exec((err, masters) => {
+      var message = 'По вашей категории есть новый заказ, подробности в личном кабинете thetopmastrs.ru'
+      masters.forEach(elem => {
+        Send_sms(elem.PhoneNumber, message)
+      })
+    })
     return res.send('200')
   })
 });
+
+app.post('/find_user', (req, res) => {
+  model.User.find()
+  .where('role').equals('master')
+  .where('status').equals('active')
+  .where('merchant.status').nin(['free'])
+  .where('name').equals(order.name)
+  .select('PhoneNumber -_id')
+  .exec((err, masters) => {
+    var receivers = []
+    var message = 'По вашей категории есть новый заказ, подробности в личном кабинете thetopmastrs.ru'
+    masters.forEach(elem => {
+      Send_sms(elem.PhoneNumber, message)
+    })
+    console.log(receivers.toString())
+  })
+})
 
 /* MasteVote. */
 app.post('/master_vote/:mastername.:orderid', function(req, res) {
@@ -471,13 +505,21 @@ app.post('/master_vote/:mastername.:orderid', function(req, res) {
 
 /* ClientVote. */
 app.post('/client_vote/:mastername.:orderid', function(req, res) {
-  console.log(req.body.price);
   model.Order.findByIdAndUpdate(
     req.params.orderid,
-    {$addToSet: {master:req.params.mastername, status:'in_progress'}},
-    {safe: true, upsert: true},
+    {$set: {master:req.params.mastername, status:'in_progress'}},
+    {safe: true, upsert: true, new: true},
     function(err, order_vote){
-      console.log('Mater Vote');
+      if (err) console.log(err)
+      console.log(order_vote)
+      model.User.findOne({_id:req.params.mastername})
+      .select('PhoneNumber')
+      .exec((err, doc) => {
+        if (err) console.log(err)
+        var message = 'Заказ ' + order_vote + 'выбрал вас. Позвоните ему по телефну ' + doc.PhoneNumber
+        Send_sms(doc.PhoneNumber, message)
+        res.redirect('/dashboard')
+      })
       ;
     }
   )
@@ -524,7 +566,7 @@ app.get('/dashboard', loadUser, function(req, res, next){
   if (req.session.user.role == 'client') {
     model.Order
     .find({customer:req.session.user._id})
-    .populate('name customer votes.master')
+    .populate('name customer votes.master votes.comments.user')
     .exec(function(err, docs){
       res.render('dashboard', {orders:docs});
       })
@@ -532,33 +574,74 @@ app.get('/dashboard', loadUser, function(req, res, next){
     console.log('User is master!');
     model.Order
     .find({})
-    .populate('name customer')
+    .populate('name customer votes votes.comments.user')
     .exec(function(err, docs){
       res.render('dashboard', {callb:'Новый заказ', orders:docs});
     })
   }
 });
 
-app.get('/socket_test', function(req, res, next){
+app.get('/socket_test', loadUser, function(req, res, next){
  res.render('socket_test')
 
 })
 
-var getResult = function(num){
-  result = num + 2
-  console.log('Get result: ' + result)
-}
-
 io.on('connection', function(socket) {
-    console.log(socket + '  Client connected...');
+  socket.on('join', function(data) {
+    if (socket.request.session.user) {
+      socket.join(socket.request.session.user._id)
+      console.log(socket.request.session.user._id + ' Logged on...')
+    }
+    else console.log('no session')
+  })
 
-    socket.on('join', function(data) {
+//Register new cart while charging moths fee
+    socket.on('register_cart', function(){
+      console.log('Register cart')
+      var Cart = new model.Cart
+      Cart._id = new mongoose.Types.ObjectId()
+      Cart.user = socket.request.session.user._id
+      Cart.save(function(err, cart){
+        if (err) console.log(err)
+        socket.emit('cart_registered', cart)
     })
-    
-    socket.on('get_result', function(data){
-      getResult(data)
+  })
+
+//Messages
+    socket.on('send_message', function(data){
+      console.log('Recieved message: ' + data.voteid)
+      console.log('From: ' + socket.request.session.user._id)
+      // model.Order.findOne({'votes._id':data.voteid}).select({'votes._id':data.voteid})
+      // .push({comments:{user:data.from, message:data.message}})
+      // .save()
+      // .exec((err, docs) => console.log(docs))
+      model.Order.findOneAndUpdate(
+        {'votes._id': data.voteid, 'votes._id':data.voteid},
+        {$push: {'votes.$.comments': {user:data.from, message:data.message}}},
+        {new:true},
+        function(err, doc){
+          model.Order.populate(doc.votes, {
+            path:'comments.user',
+            model:'User'
+          }, function(err, doc){
+              console.log(doc)
+              io.emit('new_message', {voteid: data.voteid, from: data.from, doc:doc, to: data.to})
+          })
+        }
+      )
     })
 
+// //Register new master vote
+    // socket.on('new_master_vote', function(data){
+    //   model.Order.findOne({_id:data})
+    //   .select('customer')
+    //   .exec((err, doc) => {
+    //     console.log(doc.customer)
+    //     res.render.
+    //   })
+    // })
+
+//Test querry
     socket.on('querry', function(data){
       console.log(data)
       model.User
