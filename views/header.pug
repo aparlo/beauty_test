@@ -21,7 +21,6 @@ nav.uk-box-shadow-small(class="uk-navbar-container" uk-navbar)
           .uk-margin-right
             span.uk-margin-small-right(uk-icon="icon: sign-in")
             a.uk-button.uk-button-text(href="/logout") Выход
-            a.uk-button.uk-button-text()= Ses.user.username
       when 'client'
         .uk-navbar-center
 
@@ -31,7 +30,6 @@ nav.uk-box-shadow-small(class="uk-navbar-container" uk-navbar)
           .uk-margin-right
             span.uk-margin-small-right(uk-icon="icon: sign-in")
             a.uk-button.uk-button-text(href="/logout") Выход
-            a.uk-button.uk-button-text()= Ses.user.username
 if Ses
   case Ses.user.role
     when 'master'
