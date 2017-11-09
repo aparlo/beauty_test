@@ -193,6 +193,19 @@ function show_master(id) {
   })
 }
 
+// reset password
+function changePassword(id){
+  console.log(id)
+  $.ajax({
+    url: '/reset_password',
+    type: 'POST',
+    success: (result) => {
+      UIkit.modal.alert('Новый пароль был выслан вам в СМС')
+    }
+  })
+
+}
+
 //Client vote
 function ClientVote(order, master, object){
   $.ajax({

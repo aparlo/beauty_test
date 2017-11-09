@@ -13,7 +13,7 @@ var bodyParser = require('body-parser')
 var methodOverride = require('method-override')
 var mongoose = require('mongoose')
 var model = require('./models.js')
-var url = 'mongodb://localhost:27017/testing-new'
+var url = 'mongodb://beauty:1121@localhost:27017/testing-new'
 var db = mongoose.connect(url)
 var app = express()
 var fs = require('fs')
@@ -445,7 +445,21 @@ app.get('/users', function(req, res, next){
 //   });
 // });
 
-
+//reset password
+app.post('/reset_password', genPass, (req, res, next) => {
+  console.log(req.session.user._id)
+  model.User.findOne({_id:req.session.user._id}, (err, doc) => {
+    doc.password = req.password
+    doc.save((err, doc) => {
+      if(err) console.log(err)
+      console.log(doc)
+      var message = 'Для продолжения регистрации на сайте thetopmasters.ru, введите код:' + req.password
+      //Send_sms(doc.PhoneNumber, message)
+      res.send('200')
+    })
+  })
+  
+})
 
 //Orders
 app.post('/new_order', genNumber, function(req, res) {

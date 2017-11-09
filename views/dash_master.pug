@@ -110,8 +110,12 @@
                   textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
               button.uk-button(type="submit") Изменить
         li  
-          #reset_password.uk-panel.uk-background-muted
-            h4 Сбросить пароль
+          #reset_password.uk-container-uk-background-muted
+            .uk-panel.uk-padding-large.uk-background-muted
+              h2.uk-heading-divider Сбросить пароль
+              button.uk-button(onclick="changePassword('" + Ses.user.id + "')") Сбросить пароль
+
+            
         li
           #portfolio.uk-container-large.uk-background-muted
             <div class="js-upload uk-placeholder uk-text-center">
