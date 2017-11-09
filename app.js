@@ -137,7 +137,6 @@ function genPass(req, res, next) {
   }
   req.password = pass;
   console.log('User password: ' + pass);
-  Send_sms_reg(req.body.PhoneNumber, req.password)
   next()
 }
 function genNumber(req, res, next) {
@@ -367,6 +366,8 @@ app.post('/register_order', genPass, genNumber, function(req, res, next) {
     Order.status = 'new'
     Order.save(function(err, order){
       if (err) console.log(err)
+      var message = 'Для продолжения регистрации на сайте thetopmasters.ru, введите код:' + req.password
+      Send_sms(User.PhoneNumber, message)
       return res.send(User)
     })
   })
@@ -391,8 +392,12 @@ app.post('/register', cpUpload, genPass, function(req, res, next) {
   User.go_out = req.body.go_out
   User.save(function (err, master) {
     if (err) console.log(err)
+    var message = 'Для продолжения регистрации на сайте thetopmasters.ru, введите код:' + req.password
+    Send_sms(User.PhoneNumber, message)
     console.log('registered')
   })
+
+
   db.close
   res.redirect('/login')
 });
