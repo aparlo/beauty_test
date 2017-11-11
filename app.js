@@ -1,10 +1,8 @@
 var express = require('express')
-var bcrypt = require('bcrypt')
+//var bcrypt = require('bcrypt')
 var socket_io    = require("socket.io")
 var request = require('request');
 var https = require('https');
-var session = require('express-session')
-var MongoStore = require('connect-mongo')(session)
 var path = require('path')
 var favicon = require('serve-favicon')
 var logger = require('morgan')
@@ -13,11 +11,12 @@ var bodyParser = require('body-parser')
 var methodOverride = require('method-override')
 var mongoose = require('mongoose')
 var model = require('./models.js')
-var url = 'mongodb://beauty:1121@localhost:27017/testing-new'
-var db = mongoose.connect(url)
+var config = require('./config.js')
 var app = express()
 var fs = require('fs')
 const multer = require('multer')
+
+// console.log(config)
 
 //bcrypt conf
 const saltRounds = 10;
@@ -107,25 +106,18 @@ let transporter = nodemailer.createTransport({
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-//Session config
-var sessionMiddleware = session({
-  store: new MongoStore({url:url}),
-  secret: 'keyboard cat',
-  cookie: { maxAge: 60000000 }
-  })
-
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(sessionMiddleware);
+app.use(config.sessionMiddleware);
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 io.use(function(socket, next) {
-  sessionMiddleware(socket.request, socket.request.res, next);
+  config.sessionMiddleware(socket.request, socket.request.res, next);
 })
 
 function genPass(req, res, next) {
@@ -454,7 +446,7 @@ app.post('/reset_password', genPass, (req, res, next) => {
       if(err) console.log(err)
       console.log(doc)
       var message = 'Для продолжения регистрации на сайте thetopmasters.ru, введите код:' + req.password
-      //Send_sms(doc.PhoneNumber, message)
+      Send_sms(doc.PhoneNumber, message)
       res.send('200')
     })
   })

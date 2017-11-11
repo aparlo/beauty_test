@@ -3,11 +3,14 @@ nav.uk-box-shadow-small(class="uk-navbar-container" uk-navbar)
     a(class="uk-navbar-item uk-logo" href="/") #[img(src="../images/logo_long.svg" style="height: 50%")]
   if !Ses
     .uk-navbar-center
-      ul.uk-navbar-nav.uk-nav-defaut(uk-nav)
+      ul.uk-navbar-nav.uk-nav-defaut(class=" uk-hidden@m" uk-nav)
         li
           a(href="/catalog") Каталог
         li
           a(href="/") Найти мастера
+      ul.uk-navbar-nav.uk-nav-defaut(class=" uk-visible@m" uk-nav)
+        a.uk-navbar-toggle(uk-navbar-toggle-icon class="uk-visible@m" uk-toggle="target: #mobilemenu" href="")
+
     .uk-navbar-right
       a.uk-button.uk-button-secondary.uk-margin-right( href="/register") Стать мастером
       .uk-margin-right
@@ -77,7 +80,7 @@ if Ses
         a Сбросить пароль
   ul.uk-nav.uk-nav-defaut.uk-nav-center(class="uk-hidden@s" uk-switcher="connect: .switch")
     li
-      a Заказы
+      a Заказы111
     li
       a Новый заказ
     li
