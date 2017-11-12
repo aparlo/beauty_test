@@ -3,7 +3,7 @@ var session = require('express-session')
 var mongoose = require('mongoose')
 var MongoStore = require('connect-mongo')(session)
 
-//Session config
+//Session  config
 var sessionMiddleware = session({
     store: new MongoStore({url:url}),
     secret: 'keyboard cat',
