@@ -1389,7 +1389,25 @@
     }
   };
 
-  Datepicker.LANGUAGES = {};
+  Datepicker.LANGUAGES = {
+    'ru-RU': {
+      // Days' name of the week.
+    days: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+    
+        // Shorter days' name
+        daysShort: ['Вос', 'Пон', 'Вто', 'Сре', 'Чет', 'Пят', 'Суб'],
+    
+        // Shortest days' name
+        daysMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+    
+        // Months' name
+        months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+    
+        // Shorter months' name
+        monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Maй', 'Июнб', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+    
+    }
+  };
 
   Datepicker.DEFAULTS = {
     // Show the datepicker automatically when initialized

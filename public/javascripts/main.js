@@ -1,103 +1,105 @@
-var socket = io.connect();
-
 $(function () {
 
   'use strict';
 
-  var $date = $('.docs-date');
-  var $container = $('.docs-datepicker-container');
-  var $trigger = $('.docs-datepicker-trigger');
-  var options = {
-    show: function (e) {
-      console.log(e.type, e.namespace);
-    },
-    hide: function (e) {
-      console.log(e.type, e.namespace);
-    },
-    pick: function (e) {
-      console.log(e.type, e.namespace, e.view);
-    }
-  };
+//   var $date = $('.docs-date');
+//   var $container = $('.docs-datepicker-container');
+//   var $trigger = $('.docs-datepicker-trigger');
+//   var options = {
+//     show: function (e) {
+//       console.log(e.type, e.namespace);
+//     },
+//     hide: function (e) {
+//       console.log(e.type, e.namespace);
+//     },
+//     pick: function (e) {
+//       console.log(e.type, e.namespace, e.view);
+//     },
+//     language: 'ru-RU'
+//   };
 
-  $date.on({
-    'show.datepicker': function (e) {
-      console.log(e.type, e.namespace);
-    },
-    'hide.datepicker': function (e) {
-      console.log(e.type, e.namespace);
-    },
-    'pick.datepicker': function (e) {
-      console.log(e.type, e.namespace, e.view);
-    }
-  }).datepicker(options);
+//   $date.on({
+//     'show.datepicker': function (e) {
+//       console.log(e.type, e.namespace);
+//     },
+//     'hide.datepicker': function (e) {
+//       console.log(e.type, e.namespace);
+//     },
+//     'pick.datepicker': function (e) {
+//       console.log(e.type, e.namespace, e.view);
+//     }
+//   }).datepicker(options);
 
-  $('.docs-options, .docs-toggles').on('change', function (e) {
-    var target = e.target;
-    var $target = $(target);
-    var name = $target.attr('name');
-    var value = target.type === 'checkbox' ? target.checked : $target.val();
-    var $optionContainer;
+//   $('.docs-options, .docs-toggles').on('change', function (e) {
+//     var target = e.target;
+//     var $target = $(target);
+//     var name = $target.attr('name');
+//     var value = target.type === 'checkbox' ? target.checked : $target.val();
+//     var $optionContainer;
 
-    switch (name) {
-      case 'container':
-        if (value) {
-          value = $container;
-          $container.show();
-        } else {
-          $container.hide();
-        }
+//     switch (name) {
+//       case 'container':
+//         if (value) {
+//           value = $container;
+//           $container.show();
+//         } else {
+//           $container.hide();
+//         }
 
-        break;
+//         break;
 
-      case 'trigger':
-        if (value) {
-          value = $trigger;
-          $trigger.prop('disabled', false);
-        } else {
-          $trigger.prop('disabled', true);
-        }
+//       case 'trigger':
+//         if (value) {
+//           value = $trigger;
+//           $trigger.prop('disabled', false);
+//         } else {
+//           $trigger.prop('disabled', true);
+//         }
 
-        break;
+//         break;
 
-      case 'inline':
-        $optionContainer = $('input[name="container"]');
+//       case 'inline':
+//         $optionContainer = $('input[name="container"]');
 
-        if (!$optionContainer.prop('checked')) {
-          $optionContainer.click();
-        }
+//         if (!$optionContainer.prop('checked')) {
+//           $optionContainer.click();
+//         }
 
-        break;
+//         break;
 
-      case 'language':
-        $('input[name="format"]').val($.fn.datepicker.languages[value].format);
-        break;
-    }
+//       case 'language':
+//         $('input[name="format"]').val($.fn.datepicker.languages[value].format);
+//         break;
+//     }
 
-    options[name] = value;
-    $date.datepicker('reset').datepicker('destroy').datepicker(options);
-  });
+//     options[name] = value;
+//     $date.datepicker('reset').datepicker('destroy').datepicker(options);
+//   });
 
-  $('.docs-actions').on('click', 'button', function (e) {
-    var data = $(this).data();
-    var args = data.arguments || [];
-    var result;
+//   $('.docs-actions').on('click', 'button', function (e) {
+//     var data = $(this).data();
+//     var args = data.arguments || [];
+//     var result;
 
-    e.stopPropagation();
+//     e.stopPropagation();
 
-    if (data.method) {
-      if (data.source) {
-        $date.datepicker(data.method, $(data.source).val());
-      } else {
-        result = $date.datepicker(data.method, args[0], args[1], args[2]);
+//     if (data.method) {
+//       if (data.source) {
+//         $date.datepicker(data.method, $(data.source).val());
+//       } else {
+//         result = $date.datepicker(data.method, args[0], args[1], args[2]);
 
-        if (result && data.target) {
-          $(data.target).val(result);
-        }
-      }
-    }
-  });
+//         if (result && data.target) {
+//           $(data.target).val(result);
+//         }
+//       }
+//     }
+//   });
 
-  $('[data-toggle="datepicker"]').datepicker();
+  $('[data-toggle="datepicker"]').datepicker({
+    language: 'ru-RU',
+    weekStart: 1
+    });
 
 });
 
@@ -162,9 +164,6 @@ $(document).ready(function(orders_new){
   })
 });
 
-socket.on('new_master_vote', (data)=>{
-  console.log(data)
-})
 
 function show_master(id) {
   console.log(id);
@@ -199,11 +198,10 @@ function changePassword(id){
   $.ajax({
     url: '/reset_password',
     type: 'POST',
-    success: (result) => {
+    success: function(result){
       UIkit.modal.alert('Новый пароль был выслан вам в СМС')
     }
   })
-
 }
 
 //Client vote
@@ -211,7 +209,7 @@ function ClientVote(order, master, object){
   $.ajax({
     url: '/client_vote/' + master + '.' + order,
     type: 'POST',
-    success: (result) => {
+    success: function(result){
       UIkit.modal.alert('Спасибо! Мастер свяжется с вами в ближайшее время.')
       $(document.body).html(result)
     }
@@ -236,25 +234,19 @@ function nextTab() {
   // and here you call this function again
   setTimeout(nextTab, 10000);
 }
+
 $(document).ready(function(){
   setTimeout(nextTab, 0);
 })
 
-// $(document).ready(function(){
-//   $('#oplata').find('form').submit(function(e){
-//     console.log('Found form')
-//     e.preventDefault
-//   })
-  
-// })
+
 
 //Sockets
+var socket = io.connect();
 socket.on('connect', function(data) {
   socket.emit('join', 'HeyHey');
 })
-//- socket.on('messages', function(data){
-//-   alert(data)
-//- })
+
 
 $(document).ready(function(){
   $("#inp").keyup(function(e){
@@ -304,33 +296,3 @@ $(document).ready(function(){
     })
   })
 })
-
-// function SendMessage(from, to, voteid, object){
-//   user_message = $(object).siblings('textarea').val()
-//   console.log('Sent message: '+ user_message)
-//   socket.emit('send_message', {to:to, from: from, voteid:voteid, message:user_message})
-//   $(object).siblings('textarea').val('')
-//   $(object).siblings('#master_messages' + to).append('<b>Вы: </b>' + user_message + '<br />')
-//   $(object).siblings('#client_messages' + to).append('<b>Вы: </b>' + user_message + '<br />')
-// }
-
-// socket.on('new_message', function(data){
-//   console.log(data)
-//   $('#master_messages' + data.from).append('Клиент: ' + data.message + '<br />')
-//   $('#client_messages' + data.from).append('Мастер: ' + data.message + '<br />')
-// })
-
-// function getMessages(data){
-//   console.log(data)
-//   socket.emit('get_messages', data)
-// }
-
-// socket.on('get_messages_result', (data) =>{
-//   console.log(data.votes[1].comments)
-//   $('#master_messages'+data._id).html('Клиент: ' + data.votes[1].comments + '<br />')
-// })
-
-// socket.on('update', function(data){
-//   console.log(data)
-//   getMessages()
-// })

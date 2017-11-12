@@ -76,6 +76,7 @@ var orderSchema = new Schema({
   'number': {type: String},
   'date_desire': {type: Date},
   'time_desire': String,
+  'price_below': Number,
   'address': {
     city: String,
     district: String},

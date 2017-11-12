@@ -29,7 +29,7 @@ app.io = io
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    var path = './public/images/uploads/' + req.session.user.username
+    var path = './public/images/uploads/' + req.session.user.id
     fs.stat(path, function(err, stat){
       if (err) {
         console.log('Folder is not exist')
