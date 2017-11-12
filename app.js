@@ -29,20 +29,24 @@ app.io = io
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    var path = './public/images/uploads/' + req.session.user.id
+    var path = './public/images/uploads/' + req.session.user._id
+    console.log('Folder will be: ' + path)
     fs.stat(path, function(err, stat){
       if (err) {
         console.log('Folder is not exist')
-        fs.mkdir(path)
+        fs.mkdir(path, function(err){
+          if(err) console.log(err)
+          cb(null, path)
+        })
       }
       else if (!stat.isDirectory()){
         console.log('Is not a folder')
       }
       else{
         console.log('Folder exist')
+        cb(null, path)
       }
     })
-    cb(null, path)
   },
   filename: function (req, file, cb) {
     cb(null, req.session.user.username + file.originalname)
@@ -203,9 +207,8 @@ function AddPortfolio(req, res, next){
   next()
 }
 
-app.post('/file_upload', cpUpload, AddPortfolio, function(req, res, next){
+app.post('/file_upload', loadUser, cpUpload, AddPortfolio, function(req, res, next){
   res.send('OK').status(200)
-  res.end()
 })
 
 app.get('/send_sms', function(req, res) {

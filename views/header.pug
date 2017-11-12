@@ -2,6 +2,7 @@ nav.uk-box-shadow-small(class="uk-navbar-container" uk-navbar)
   .uk-navbar-left
     a(class="uk-visible@l uk-navbar-item uk-logo" href="/") #[img(src="../images/logo_long.svg" style="height: 50%")]
     a(class="uk-hidden@l uk-navbar-item uk-logo" href="/") #[img(src="../images/logo_short.svg" style="height: 50%")]
+
   if !Ses
     .uk-navbar-center
       ul.uk-navbar-nav.uk-nav-defaut(class=" uk-visible@m" uk-nav)
@@ -38,7 +39,9 @@ if Ses
     when 'master'
       nav.uk-navbar-container
           .uk-navbar-center.uk-flex-center
-            ul.uk-navbar-nav(uk-switcher="connect: .switch")
+            ul.uk-navbar-nav.uk-nav-defaut(class=" uk-hidden@m" uk-nav)
+              a.uk-navbar-toggle(uk-navbar-toggle-icon uk-toggle="target: #mobilemenu" href="#")
+            ul.uk-navbar-nav(class="uk-visible@m" uk-switcher="connect: .switch")
               li
                 a Заказы  
                   if orders
@@ -47,12 +50,10 @@ if Ses
                 a Редактирование профиля
               li
                 a Сменить пароль
-              li
+              li.portfolio
                 a Портфолио
-              //- li
-                a Мой Счет
-              //- li
-                a Сообщения
+
+          
     when 'client'
       nav.uk-navbar-container
           .uk-navbar-center.uk-flex-center
@@ -65,8 +66,7 @@ if Ses
                 a Редактирование профиля
               li
                 a Сбросить пароль
-              //- li
-                a Сообщения
+ 
 #mobilemenu(hidden)
   nav.uk-navbar-container(uk-navbar="dropbar: true; dropbar-mode: push")
     ul.uk-navbar-nav.uk-nav-primary.uk-nav-center(class="uk-visible@s" uk-switcher="connect: .switch")
@@ -80,7 +80,7 @@ if Ses
         a Сбросить пароль
   ul.uk-nav.uk-nav-defaut.uk-nav-center(class="uk-hidden@s" uk-switcher="connect: .switch")
     li
-      a Заказы111
+      a Заказы
     li
       a Новый заказ
     li
