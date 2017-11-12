@@ -33,7 +33,7 @@ var storage = multer.diskStorage({
     fs.stat(path, function(err, stat){
       if (err) {
         console.log('Folder is not exist')
-        fs.mkdir(path)
+        fs.mkdir(path[, 0777])
       }
       else if (!stat.isDirectory()){
         console.log('Is not a folder')
