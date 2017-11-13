@@ -3,7 +3,7 @@ extends layout
 block content
   .uk-section-large.uk-section-muted
     .uk-container
-      .uk-grid-small.uk-child-width-1-4.uk-grid-match(uk-grid)
+      .uk-grid-small.uk-grid-match(class="uk-child-width-1-4@l" uk-grid)
         each val, i in masters
           div
             .uk-card.uk-card-default.uk-card-body.uk-box-shadow-hover-large.uk-box-shadow-small(onclick="show_master('master_card" + val.id + "')")
