@@ -276,7 +276,7 @@ app.get('/catalog/:usluga', function(req, res){
   var usluga = req.params.usluga
   console.log('Выбрана' + usluga)
   model.Uslugi.findOne({_id:usluga}, function(err, usluga){
-    model.User.find({"uslugi.cat":usluga.id}, function(err, docs) {
+    model.User.find({"uslugi.sub_cat":usluga.id}, function(err, docs) {
       console.log(docs.username + '' + usluga)
       res.render('catalog', {masters: docs});
     })
