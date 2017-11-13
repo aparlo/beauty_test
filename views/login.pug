@@ -2,14 +2,19 @@ extends layout
 
 block content
   .uk-section
-    div.uk-container.uk-container-small.uk-background-default.uk-padding-large.uk-box-shadow-large(class="uk-width-1-3@m uk-width-1-1")
-      h2.uk-modal-title Вход
-      form(method="post" action='/login')
-        fieldset.uk-fieldset
-          .uk-margin
-            input.uk-input(type="text" value='' name="username" placeholder="Имя пользователя")
-          .uk-margin
-            input.uk-input(type="password" value='' name="password" placeholder="Пароль")
-          button.uk-margin-right.uk-button.uk-button-secondary(type="submit") Вход
-          a.uk-margin.uk-button-text(href="/register") Регистрация
-        h3 #{error}
+    div.uk-container(class="uk-width-1-3@l uk-width-1-2@m uk-width-1-1@s")
+      .uk-card.uk-card-default
+        .uk-card-header.uk-flex-center
+          h2.uk-card-title Вход
+        .uk-card-body.uk-flex-wrap-stretch
+          form(method="post" action='/login')
+            fieldset.uk-fieldset
+              .uk-margin
+                input.uk-input(type="text" value='' name="username" placeholder="e-mail")
+              .uk-margin
+                input.uk-input(type="password" value='' name="password" placeholder="Пароль")
+              button.uk-margin-right.uk-button.uk-button-secondary(type="submit") Вход
+              a.uk-margin.uk-button-text(href="/lost_password") Забыли пароль?
+        .uk-card-footer
+          a.uk-link-texreset Еще не зарегистрировались?
+          h3 #{error}
