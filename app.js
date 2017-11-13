@@ -272,7 +272,7 @@ app.get('/master_card:_id', function(req, res){
 
 
 //Filter
-app.get('/catalog:usluga', function(req, res){
+app.get('/catalog/:usluga', function(req, res){
   var usluga = req.params.usluga
   console.log('Выбрана' + usluga)
   model.Uslugi.findOne({_id:usluga}, function(err, usluga){
