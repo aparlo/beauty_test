@@ -174,13 +174,16 @@ function show_master(id) {
       var muslugi = result.uslugi
       console.log(muslugi);
       jQuery.each(muslugi, function(i, val) {
-        $('#master_card_data ul')
-          .append('<li>'+val.name.name+'</li>')
-          .append('<ul>')
-          jQuery.each(val.sub_cat, function(j, sval) {
-            $('#master_card_data ul ul')
-            .append('<li>' + sval.name +  '</li>')
-        })
+        if (val){
+          $('#master_card_data #uslugi')
+            .append('<li>'+val.name.name+'</li>')
+            .append('<ul>')
+            jQuery.each(val.sub_cat, function(j, sval) {
+              $('#master_card_data ul ul')
+              .append('<li>' + sval.name +  '</li>')
+          })
+        }
+        else {console.log('no value')}
       });
       $('#master_card_data').append('</ul>')
       $('#PhoneNumber').html(result.PhoneNumber)

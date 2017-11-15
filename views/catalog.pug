@@ -13,12 +13,6 @@ block content
                 each val, k in masters[i].uslugi
                   if val != null
                     li= val.name.name
-                      //- .uk-accordion-content
-                      //-   ul
-                      //-     each val, j in masters[i].uslugi[k].sub_cat
-                      //-       if val != null
-                      //-         li= val.name
-                      //-       else
                   else
             div(id="master_card" + val.id uk-modal)
               .uk-modal-dialog.uk-modal-body
@@ -28,7 +22,7 @@ block content
                   .uk-width-1-2
                     h4.uk-margin-remove Услуги мастера:
                     div.uk-margin-remove-top#master_card_data
-                      ul.uk-margin-remove-top.uk-list
+                      ul#uslugi.uk-margin-remove-top.uk-list
                   .uk-width-1-2
                     p.uk-text.meta Телефон:
                     h3.uk-margin-remove #{val.PhoneNumber}
