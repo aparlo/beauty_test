@@ -5,7 +5,7 @@ block content
     h4 #[span username] #[span Password] #[span FirstName] #[span LastName] #[span PhoneNumber] #[span E-mail] #[span About] #[span Role]
     
     each val, i in users
-      form(id="edit", method="post", action='/register/' + users[i].id)
+      form(id="edit", method="post", action='/register' + users[i].id enctype="multipart/form-data")
         input(type="text", value=users[i].username, name="username")
         input(type="text", value=users[i].password, name="password")
         input(type="text", value=users[i].FirstName, name="FirstName")

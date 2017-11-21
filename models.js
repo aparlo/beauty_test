@@ -93,7 +93,7 @@ var orderSchema = new Schema({
 }], //сюда помещается предложения исполнителей как объекты.
   'status': {type:String, default:'new'},
   'master': {type: Schema.Types.ObjectId, ref:'User'},
-  'place': String
+  'go_out': String
 })
 
 module.exports.Names = mongoose.model('Names', {

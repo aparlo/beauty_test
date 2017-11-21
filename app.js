@@ -370,8 +370,8 @@ app.post('/register_order', genPass, genNumber, function(req, res, next) {
 
 //Register
 app.post('/register', cpUpload, genPass, function(req, res, next) {
-  console.log(req.body.username);
   var uslugi = Array.prototype.slice.call(req.body.uslugi)
+  console.log(uslugi);
   var User = new model.User
   User.username = req.body.Email
   User.password = req.password
@@ -391,29 +391,30 @@ app.post('/register', cpUpload, genPass, function(req, res, next) {
     Send_sms(User.PhoneNumber, message)
     console.log('registered')
   })
-  db.close
   res.redirect('/login')
 });
 
 
 // Edit registered users
-app.post('/register/:id', function(req, res, next) {
+app.post('/register:id', cpUpload, function(req, res, next) {
   var uslugi = Array.prototype.slice.call(req.body.uslugi)
-  var userid = req.params.id;
-  model.User.findById(userid, function(err, docs) {
-    docs.username = req.body.username;
-    docs.password = req.body.password;
-    docs.role = req.body.role;
-    docs.FirstName = req.body.FirstName;
-    docs.LastName = req.body.LastName;
-    docs.PhoneNumber = req.body.PhoneNumber;
-    docs.Email = req.body.Email;
-    docs.about = req.body.about;
-    docs.save(function(err, uDocs){
-      console.log(uDocs);
-      res.redirect('/users');
+  var userid = req.params.id
+  console.log(req.body.uslugi)
+  model.User.findOneAndUpdate({_id:userid}, {
+    $set: {
+      FirstName: req.body.FirstName,
+      LastName: req.body.LastName,
+      PhoneNumber: req.body.PhoneNumber,
+      city: req.body.city,
+      about: req.body.about,
+      uslugi: uslugi
+    }},
+    {safe: true, upsert:true, new:true},
+    function(err, docs){
+      if(err) console.log(err)
+      console.log('User Changed! ' + docs);
+      res.redirect('/dashboard');
     });
-  });
 });
 
 
@@ -569,7 +570,6 @@ app.post('/payment_ok', loadUser, changeDate, function(req, res, next){
 
 
 app.get('/session', loadUser, function(req, res, next){
-  console.log(req.session.id);
   res.send(req.session.id + ' ' + req.session.user.role);
 });
 
@@ -583,17 +583,21 @@ app.get('/dashboard', loadUser, function(req, res, next){
       res.render('dashboard', {orders:docs});
       })
   } else if (req.session.user.role == 'master'){
-    console.log(req.session.user.uslugi);
     var muslugi = req.session.user.uslugi
     var uslugi = []
     muslugi.forEach(elem => {
-      elem.sub_cat.forEach(elem2 => {
-        uslugi.push(elem2)
-      })
+      if (elem != null){
+        elem.sub_cat.forEach(elem2 => {
+          uslugi.push(elem2)
+        })
+    }
     })
     model.Order
     .find()
     .where('name').in(uslugi)
+    .where('place').equals(req.session.user.go_out)
+    .where('address.city').equals(req.session.user.address.city)
+    // .where('address.district').equals(req.session.user.address.district)
     .populate('name customer votes votes.comments.user')
     .exec(function(err, docs){
       res.render('dashboard', {callb:'Новый заказ', orders:docs});
@@ -603,7 +607,6 @@ app.get('/dashboard', loadUser, function(req, res, next){
 
 app.get('/socket_test', loadUser, function(req, res, next){
  res.render('socket_test')
-
 })
 
 io.on('connection', function(socket) {
@@ -631,10 +634,6 @@ io.on('connection', function(socket) {
     socket.on('send_message', function(data){
       console.log('Recieved message: ' + data.voteid)
       console.log('From: ' + socket.request.session.user._id)
-      // model.Order.findOne({'votes._id':data.voteid}).select({'votes._id':data.voteid})
-      // .push({comments:{user:data.from, message:data.message}})
-      // .save()
-      // .exec((err, docs) => console.log(docs))
       model.Order.findOneAndUpdate(
         {'votes._id': data.voteid, 'votes._id':data.voteid},
         {$push: {'votes.$.comments': {user:data.from, message:data.message}}},

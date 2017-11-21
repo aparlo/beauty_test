@@ -67,6 +67,8 @@
                 each sub, s in Ses.user.uslugi[c].sub_cat
                   - usl.push(sub.toString())
               else
+            script
+              include ../public/javascripts/register.js
             form(method="post" action='/register' + Ses.user.id enctype="multipart/form-data")
               .uk-margin
                 input.uk-input(type="text" placeholder="Имя" name="FirstName" value=Ses.user.FirstName)        
@@ -96,7 +98,7 @@
                     li
                       h3.uk-accordion-title= uslugi[i].name
                       .uk-accordion-content
-                        input.uk-hidden.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][name]" value=uslugi[i].id)
+                        input.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][name]" value=uslugi[i].id)
                         ul
                           each val, k in uslugi[i].sub_cat
                             if usl.indexOf(val.id.toString()) != -1
@@ -104,7 +106,7 @@
                             else
                               - checked = false
                             li
-                              label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat]" checked=checked)] #{uslugi[i].sub_cat[k].name}
+                              label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat]" value=uslugi[i].sub_cat[k].id checked=checked)] #{uslugi[i].sub_cat[k].name}
                   .uk-margin-top
                     label #[input.uk-checkbox(type="checkbox" name="go_out" checked=(Ses.user.go_out))] Выезжаю к клиенту
                   textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")

@@ -41,8 +41,8 @@ block content
               input#mail_input.uk-input(type="text" placeholder="Эл. почта" name="Email" required)
             .uk-width-1-1
             label.uk-width-1-1.uk-margin-large-right Место встречи с мастером: 
-            label(class="uk-margin-remove-top").uk-margin-right #[input.address.uk-radio(type="radio" name="place" value="client" checked="checked")] у меня
-            label(class="uk-margin-remove-top") #[input.uk-radio(type="radio" name="place" value="master")] у мастера
+            label(class="uk-margin-remove-top").uk-margin-right #[input.address.uk-radio(type="radio" name="place" value="true" checked="checked")] у меня
+            label(class="uk-margin-remove-top") #[input.uk-radio(type="radio" name="place" value="false")] у мастера
             #address.uk-width-1-1
               select#city.uk-select.uk-width-1-2(name="city" default="Вронеж")
                 option Воронеж
