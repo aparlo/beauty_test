@@ -2,99 +2,7 @@ $(function () {
 
   'use strict';
 
-//   var $date = $('.docs-date');
-//   var $container = $('.docs-datepicker-container');
-//   var $trigger = $('.docs-datepicker-trigger');
-//   var options = {
-//     show: function (e) {
-//       console.log(e.type, e.namespace);
-//     },
-//     hide: function (e) {
-//       console.log(e.type, e.namespace);
-//     },
-//     pick: function (e) {
-//       console.log(e.type, e.namespace, e.view);
-//     },
-//     language: 'ru-RU'
-//   };
 
-//   $date.on({
-//     'show.datepicker': function (e) {
-//       console.log(e.type, e.namespace);
-//     },
-//     'hide.datepicker': function (e) {
-//       console.log(e.type, e.namespace);
-//     },
-//     'pick.datepicker': function (e) {
-//       console.log(e.type, e.namespace, e.view);
-//     }
-//   }).datepicker(options);
-
-//   $('.docs-options, .docs-toggles').on('change', function (e) {
-//     var target = e.target;
-//     var $target = $(target);
-//     var name = $target.attr('name');
-//     var value = target.type === 'checkbox' ? target.checked : $target.val();
-//     var $optionContainer;
-
-//     switch (name) {
-//       case 'container':
-//         if (value) {
-//           value = $container;
-//           $container.show();
-//         } else {
-//           $container.hide();
-//         }
-
-//         break;
-
-//       case 'trigger':
-//         if (value) {
-//           value = $trigger;
-//           $trigger.prop('disabled', false);
-//         } else {
-//           $trigger.prop('disabled', true);
-//         }
-
-//         break;
-
-//       case 'inline':
-//         $optionContainer = $('input[name="container"]');
-
-//         if (!$optionContainer.prop('checked')) {
-//           $optionContainer.click();
-//         }
-
-//         break;
-
-//       case 'language':
-//         $('input[name="format"]').val($.fn.datepicker.languages[value].format);
-//         break;
-//     }
-
-//     options[name] = value;
-//     $date.datepicker('reset').datepicker('destroy').datepicker(options);
-//   });
-
-//   $('.docs-actions').on('click', 'button', function (e) {
-//     var data = $(this).data();
-//     var args = data.arguments || [];
-//     var result;
-
-//     e.stopPropagation();
-
-//     if (data.method) {
-//       if (data.source) {
-//         $date.datepicker(data.method, $(data.source).val());
-//       } else {
-//         result = $date.datepicker(data.method, args[0], args[1], args[2]);
-
-//         if (result && data.target) {
-//           $(data.target).val(result);
-//         }
-//       }
-//     }
-//   });
 
   $('[data-toggle="datepicker"]').datepicker({
     language: 'ru-RU',
@@ -123,7 +31,6 @@ $(document).ready(function(){
     })
 });
 
-//New orders
 
 //New order submit
 $(document).ready(function(){
@@ -142,15 +49,14 @@ $(document).ready(function(){
     })
 });
 
+//Master vote
 $(document).ready(function(orders_new){
   $("#orders .submit").click(function(){
     $(this).closest("form")
+      .prop('hidden', true)
       .submit(function(event){
         event.preventDefault()
         var action = $(this).attr('action')
-        // result = action.replace(/(.+\/.+\.)(.+)/g, '$2')
-        // console.log(result)
-        // socket.emit('new_master_vote', result)
         $.ajax({
               url: $(this).attr('action'),
               type: 'POST',
@@ -195,16 +101,22 @@ function show_master(id) {
   })
 }
 
-// reset password
-function changePassword(id){
+//reset password
+function changePassword(id, object){
   console.log(id)
-  $.ajax({
-    url: '/reset_password',
-    type: 'POST',
-    success: function(result){
-      UIkit.modal.alert('Новый пароль был выслан вам в СМС')
+  var pass1 = $(object).siblings('input[name=new_password]').val()
+  var pass2 = $(object).siblings('input[name=new_password_rep]').val()
+  if (pass1 == pass2) {
+    console.log(pass1)  
+    $.ajax({
+      url: '/reset_password/' + pass1,
+      type: 'POST',
+      success: function(result){
+        UIkit.modal.alert('Вы изменили пароль. Он выслан вам в СМС')
     }
   })
+  }
+ 
 }
 
 //Client vote
@@ -242,6 +154,10 @@ $(document).ready(function(){
   setTimeout(nextTab, 0);
 })
 
+//Input mask
+$(function(){
+  $('#phone_input').mask('+7(999)999-9999')
+})
 
 
 //Sockets

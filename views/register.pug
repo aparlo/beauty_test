@@ -16,7 +16,7 @@ block content
         .uk-margin
           input.uk-input(type="text" placeholder="Фамилия" name="LastName" )
         .uk-margin
-          input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" )      
+          input#phone_input.uk-input(type="text" placeholder="Телефон" name="PhoneNumber" )      
         .uk-margin
           input.uk-input(type="email" placeholder="E-mail" name="Email" )
         .uk-margin
@@ -41,11 +41,12 @@ block content
               li
                 h3.uk-accordion-title= uslugi[i].name
                 .uk-accordion-content
-                  input.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][name]" value=uslugi[i].id)
+                  input.parent.uk-checkbox(type="checkbox" name="uslugi["+i+"][name]" value=uslugi[i].id hidden)
+                  input.selall.uk-checkbox(type="checkbox" name="")
                   ul
                     each val, k in uslugi[i].sub_cat
                       li
-                        label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat]" value=uslugi[i].sub_cat[k].id)] #{uslugi[i].sub_cat[k].name}
+                        label #[input.child.uk-checkbox(type="checkbox" name="uslugi["+i+"][sub_cat]" value=uslugi[i].sub_cat[k].id)] #{uslugi[i].sub_cat[k].name} #[input#sprice(placeholder="Цена от..." hidden)]
           label #[input.uk-checkbox(type="checkbox" name="go_out")] Выезжаю к клиенту
           label #[input.uk-checkbox(type="checkbox" name="go_out")] Принимаю в салоне
           label #[input.uk-checkbox(type="checkbox" name="go_out")] Принимаю на дому

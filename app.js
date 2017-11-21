@@ -391,15 +391,13 @@ app.post('/register', cpUpload, genPass, function(req, res, next) {
     Send_sms(User.PhoneNumber, message)
     console.log('registered')
   })
-
-
   db.close
   res.redirect('/login')
 });
 
 
 // Edit registered users
-app.post('/register/:id', function(req, res) {
+app.post('/register/:id', function(req, res, next) {
   var uslugi = Array.prototype.slice.call(req.body.uslugi)
   var userid = req.params.id;
   model.User.findById(userid, function(err, docs) {
@@ -441,14 +439,14 @@ app.get('/users', function(req, res, next){
 // });
 
 //reset password
-app.post('/reset_password', genPass, (req, res, next) => {
+app.post('/reset_password/:pass', (req, res, next) => {
   console.log(req.session.user._id)
   model.User.findOne({_id:req.session.user._id}, (err, doc) => {
-    doc.password = req.password
+    doc.password = req.params.pass
     doc.save((err, doc) => {
       if(err) console.log(err)
       console.log(doc)
-      var message = 'Для продолжения регистрации на сайте thetopmasters.ru, введите код:' + req.password
+      var message = 'Ваш новый пароль на thetopmasters.ru: ' + doc.password
       Send_sms(doc.PhoneNumber, message)
       res.send('200')
     })
@@ -585,9 +583,17 @@ app.get('/dashboard', loadUser, function(req, res, next){
       res.render('dashboard', {orders:docs});
       })
   } else if (req.session.user.role == 'master'){
-    console.log('User is master!');
+    console.log(req.session.user.uslugi);
+    var muslugi = req.session.user.uslugi
+    var uslugi = []
+    muslugi.forEach(elem => {
+      elem.sub_cat.forEach(elem2 => {
+        uslugi.push(elem2)
+      })
+    })
     model.Order
-    .find({})
+    .find()
+    .where('name').in(uslugi)
     .populate('name customer votes votes.comments.user')
     .exec(function(err, docs){
       res.render('dashboard', {callb:'Новый заказ', orders:docs});

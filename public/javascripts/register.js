@@ -1,29 +1,36 @@
 $(document).ready(function(){
   $("input.child").on("change", function(){
-    var par = $(this).closest("ul").siblings("input:checkbox")
-    var par = $(this).closest("ul").siblings("input:checkbox")
+    var par = $(this).closest("ul").siblings(".parent")
     var n = $(this).closest("ul").find("input:checked").length
-    var sib = $(this).closest("li").find("#sprice").attr("disabled", false)
+    var sib = $(this).closest("li").find("#sprice")
+    if ( $(this).prop('checked') == true) {
+      sib.attr("hidden", false)
+    }
+    else {
+      console.log(sib)
+      sib.attr('hidden', true)
+    }
+
     if (n > 0){
       par.attr("checked", true)
     }
     else {
       par.attr("checked", false)
     }
-    console.log(n)
   });
 });
 
-// $(document).ready(function(){
-//   $("input").on("change", function(){
-//     if ($("input.address").is(":checked")){
-//       $("#address").show()
-//     }
-//     else {
-//       $("#address").hide()
-//     }
-//   })
-// });
+$(document).ready(function(){
+  $('input.selall').on('change', function(){
+    var sib = $(this).next("ul").find("li .child")
+    if ($(this).prop('checked') == true){
+      sib.prop('checked', true)
+    }
+    else{
+      sib.prop('checked', false)
+    }
+  })
+})
 
 $(document).ready(function(){
   $("select").on("change", function(){

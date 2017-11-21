@@ -36,9 +36,9 @@ block content
             .uk-width-1-2.uk-margin-remove-top
               input.uk-input.uk-input-large(type="text" placeholder="Фамилия" name="LastName" required)
             .uk-width-1-1
-              input.uk-input(type="tel" placeholder="8 (___) ___-__-__" name="PhoneNumber" pattern="8 \([0-9]{3}\) [0-9]{3}\-[0-9]{2}\-[0-9]{2}" value="" required)      
+              input#phone_input.uk-input(type="text" name="PhoneNumber" value="" placeholder="Телефон" required)      
             .uk-width-1-1
-              input.uk-input(type="email" placeholder="Эл. почта" name="Email" required)
+              input#mail_input.uk-input(type="text" placeholder="Эл. почта" name="Email" required)
             .uk-width-1-1
             label.uk-width-1-1.uk-margin-large-right Место встречи с мастером: 
             label(class="uk-margin-remove-top").uk-margin-right #[input.address.uk-radio(type="radio" name="place" value="client" checked="checked")] у меня
