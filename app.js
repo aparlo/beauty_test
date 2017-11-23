@@ -457,18 +457,20 @@ app.post('/reset_password/:pass', (req, res, next) => {
 
 //Orders
 app.post('/new_order', genNumber, function(req, res) {
-  var Order = new model.Order
-  Order.name = req.body.OrderName
-  Order.number = req.number
-  Order.date_desire = req.body.OrderDate
-  Order.time_desire = req.body.OrderTime
-  Order.customer = res.locals.Ses.user.id
-  Order.place = req.body.place
-  Order.address.city = req.body.city
-  Order.address.district = req.body.district
-  Order.status = 'new'
-  Order.save(function(err, order){
+  console.log(req.body)
+  var newOrder = new model.Order
+  newOrder.name = req.body.OrderName
+  newOrder.number = req.number
+  newOrder.date_desire = req.body.OrderDate
+  newOrder.time_desire = req.body.OrderTime
+  newOrder.customer = req.session.user.id
+  newOrder.place = req.body.place
+  newOrder.address.city = req.body.city
+  newOrder.address.district = req.body.district
+  newOrder.status = 'new'
+  newOrder.save(function(err, order){
     if (err) console.log(err)
+    console.log(order)
     model.User.find()
     .where('role').equals('master')
     .where('status').equals('active')
@@ -479,11 +481,12 @@ app.post('/new_order', genNumber, function(req, res) {
       var message = 'По вашей категории есть новый заказ, подробности в личном кабинете thetopmastrs.ru'
       masters.forEach(elem => {
         Send_sms(elem.PhoneNumber, message)
+        return res.send('200')
       })
     })
-    res.send('200')
   })
-});
+})
+
 
 app.post('/find_user', (req, res) => {
   model.User.find()
