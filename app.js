@@ -481,7 +481,7 @@ app.post('/new_order', genNumber, function(req, res) {
         Send_sms(elem.PhoneNumber, message)
       })
     })
-    return res.send('200')
+    res.send('200')
   })
 });
 
@@ -537,6 +537,19 @@ app.post('/client_vote/:mastername.:orderid', function(req, res) {
     }
   )
 });
+
+//Close order
+app.post('/order/close:id', function(req, res, next){
+  model.Order.findByIdAndUpdate(
+    req.params.id,
+    {$set: {status: 'complete'}},
+    {new:true},
+    function(err, doc){
+      console.log('Order is closed')
+      res.send(200)
+    }
+  )
+})
 
 
 function changeDate(req, res, next){

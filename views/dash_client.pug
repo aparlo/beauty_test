@@ -48,8 +48,8 @@
                                       p.uk-margin-remove-bottom <b> #{val.user.FirstName} </b>
                                       p.uk-margin-remove-top= val.message
                                   .uk-inline
-                                    textarea#user_message.uk-textarea.uk-form-width-large(type="textarea")
-                                    button.uk-button.uk-button-primary( onclick="SendMessage('" + Ses.user._id + "', '" + orders[i].votes[o].master._id + "', '" + orders[i].votes[o]._id + "', this)" uk-icon="icon: comment") Отправить
+                                    textarea.uk-textarea.uk-form-width-large(type="textarea" from=Ses.user._id to=orders[i].votes[o].master._id voteid=orders[i].votes[o]._id)
+                                    button#send_button.uk-button.uk-button-primary( onclick="SendMessage('" + Ses.user._id + "', '" + orders[i].votes[o].master._id + "', '" + orders[i].votes[o]._id + "', this)" uk-icon="icon: comment") Отправить
                                     button.uk-button.uk-button-default( onclick="ClientVote('" + orders[i]._id + "', '" + orders[i].votes[o].master._id + "', this)" uk-icon="icon: user") Выбрать мастера
                             div(id="master_card" + val.master.id uk-modal)
                               .uk-modal-dialog.uk-modal-body
@@ -88,9 +88,8 @@
                                         p.uk-margin-remove-bottom <b> #{val.user.FirstName} </b>
                                         p.uk-margin-remove-top= val.message
                                     .uk-inline
-                                      textarea#user_message.uk-textarea.uk-form-width-large(type="textarea")
-                                      button.uk-button.uk-button-primary( onclick="SendMessage('" + Ses.user._id + "', '" + orders[i].votes[o].master._id + "', '" + orders[i].votes[o]._id + "', this)" uk-icon="icon: check") Заказ завершен
-                                      button.uk-button.uk-button-danger( onclick="ClientVote('" + orders[i]._id + "', '" + orders[i].votes[o].master._id + "', this)" uk-icon="icon: warning") Что-то пошло не так
+                                      textarea#user_message.uk-textarea.uk-form-width-large(type="")
+                                      button#send_button.uk-button.uk-button-primary( onclick="SendMessage('" + Ses.user._id + "', '" + orders[i].votes[o].master._id + "', '" + orders[i].votes[o]._id + "', this)") Отправить
                               div(id="master_card" + val.master.id uk-modal)
                               .uk-modal-dialog.uk-modal-body
                                 h2 #{val.master.FirstName} #{val.master.LastName}
@@ -191,11 +190,25 @@
                 textarea.uk-textarea(rows="5" name="about" placeholder="Расскажите нам о себе")
             button.uk-button(type="submit") Изменить
 script.
+  $(document).ready(function(){
+    $('textarea').on('keyup', function(e){
+      if (e.key == 'Enter'){
+      var from = $(this).attr('from')
+      var to = $(this).attr('to')
+      var object = $(this)
+      var voteid = $(this).attr('voteid')
+      var mes = $(this).val()
+      SendMessage(from, to, voteid, object)
+      }
+
+    })
+  })
+
   function SendMessage(from, to, voteid, object){
-    user_message = $(object).siblings('textarea').val()
+    user_message = $(object).val()
     console.log('Message sent: '+ user_message)
     socket.emit('send_message', {to:to, from: from, sender: 'Мастер', voteid:voteid, message:user_message})
-    $(object).siblings('textarea').val('')
+    $(object).val('')
   }
 
   socket.on('new_message', (data) => {
